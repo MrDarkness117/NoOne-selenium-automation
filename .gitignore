@@ -1,6 +1,7 @@
 ./venv
 ./venv/*
 ./venv_old/
+./runs/logs
 *.pyc
 *.log
 /runs/reports/*.txt
