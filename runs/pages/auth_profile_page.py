@@ -30,12 +30,12 @@ class AuthProfilePage(BasePage):
             locator=locator
         )
 
-    def CLASS(self, value):
+    def CLASS(self, tag, value):
         """
-        CLASS_NAME wrapper
+        Pseudo CLASS_NAME wrapper
         :return:
         """
-        locator = Locator(by=By.CLASS_NAME, value='{}'.format(value))
+        locator = Locator(by=By.XPATH, value='//{}[@class="{}"]'.format(tag, value))
         return BaseElement(
             driver=self.driver,
             locator=locator
@@ -119,7 +119,7 @@ class AuthProfilePage(BasePage):
         Выпадающий список размеров обуви
         :return:
         """
-        return self.NAME('UF_PREFERRED_SIZE')
+        return self.XPATH('//select[@name="UF_PREFERRED_SIZE"]/../div[@class="form-select-value"]')
 
     @property
     def foot_size_el(self):
@@ -135,7 +135,7 @@ class AuthProfilePage(BasePage):
         Выпадающий список размеров обуви
         :return:
         """
-        return self.NAME('UF_PREFERRED_SIZE_CL')
+        return self.XPATH('//select[@name="UF_PREFERRED_SIZE_CL"]/../div')
 
     @property
     def cloth_size_el(self):
@@ -143,7 +143,7 @@ class AuthProfilePage(BasePage):
         Пункт 'Выберите размер' меню размера одежды
         :return:
         """
-        return self.TEXT('li', 'Выберите размер', '[2]')
+        return self.XPATH('//select[@name="UF_PREFERRED_SIZE_CL"]/../ul/li[1]')
 
     @property
     def agree_terms(self):
@@ -159,7 +159,15 @@ class AuthProfilePage(BasePage):
         Сохранить изменения
         :return:
         """
-        return self.CLASS('btn btn-primary js-btn js-save-all')
+        return self.TEXT('button', 'Сохранить')
+
+    @property
+    def save_checkbox(self):
+        """
+        Чекбокс для сохранения
+        :return:
+        """
+        return self.XPATH('//input[@id="agree"]/../span')
 
     @property
     def save_accept(self):
@@ -167,7 +175,8 @@ class AuthProfilePage(BasePage):
         Кнопка "ОК" после сохранения
         :return:
         """
-        return self.CLASS('btn btn-primary bootbox-accept')
+        return self.CLASS('button', 'btn btn-primary bootbox-accept')
+
 
     # Пункты меню слева
 
@@ -250,4 +259,20 @@ class AuthProfilePage(BasePage):
         :return:
         """
         return self.TEXT('a', 'Обратная связь')
+
+    @property
+    def items_frv(self):
+        """
+        Первый товар в разделе избранных (если есть)
+        :return:
+        """
+        return self.XPATH("//div[@class='item js-item']/../../div[1]")
+
+    @property
+    def hover_block(self):
+        """
+        Третий блок hover
+        :return:
+        """
+        return self.XPATH('//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]')
 

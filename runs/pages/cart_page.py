@@ -354,10 +354,11 @@ class CartPage(BasePage):
         # row row-gap-20
         locator = Locator(
             by=By.XPATH,
-            value='//div[contains(text(), "order-block")]'
-                  '/..'
-                  '/div[@class="row row-gap-20"]'
-                  '/div[@class="form-select"]'
+            # value='//div[contains(class, "order-block")]'
+            #       '/..'
+            #       '/div[@class="row row-gap-20"]'
+            #       '/div[@class="form-select"]'
+            value='//div[contains(text(), "Дата и время доставки")]/../div[@class="row row-gap-20"]/div'
         )
         return BaseElement(
             driver=self.driver,
@@ -371,11 +372,11 @@ class CartPage(BasePage):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//div[contains(text(), "order-block")]'
+            value='//div[contains(text(), "Дата и время доставки")]'
                   '/..'
                   '/div[@class="row row-gap-20"]'
-                  '/div[@class="form-select"]'
-                  '/ul[@class="form-select-list"'
+                  '/div'
+                  '//ul[@class="form-select-list"]'
                   '/li[5]'
         )
         return BaseElement(
@@ -461,9 +462,118 @@ class CartPage(BasePage):
         # btn btn-action btn-delete js-item-delete
         locator = Locator(
             by=By.XPATH,
-            value='//button[contains(@class, "btn btn-action btn-delete js-item-delete")][1]'.format(num)
+            value='//button[contains(@class, "btn btn-action btn-delete js-item-delete")][{}]'.format(num)
         )
         return BaseElement(
             driver=self.driver,
             locator=locator
         )
+
+    @property
+    def profile(self):
+        """
+        Кнопка профиля
+        :return:
+        """
+        locator = Locator(
+            by=By.XPATH,
+            value='//li[@class="nav-item nav-item-profile"]'
+        )
+        return BaseElement(
+            driver=self.driver,
+            locator=locator
+        )
+
+    @property
+    def profile_personal_info(self):
+        """
+        Удалить заказ
+        :return:
+        """
+        locator = Locator(
+            by=By.XPATH,
+            value='//ul[@class="nav-item-dropdown"]/li[1]'
+        )
+        return BaseElement(
+            driver=self.driver,
+            locator=locator
+        )
+
+    @property
+    def profile_my_orders(self):
+        """
+        Удалить заказ
+        :return:
+        """
+        locator = Locator(
+            by=By.XPATH,
+            value='//a[contains(text(), "Мои заказы")]'
+        )
+        return BaseElement(
+            driver=self.driver,
+            locator=locator
+        )
+
+    @property
+    def profile_my_orders_open_order(self):
+        """
+        Удалить заказ
+        :return:
+        """
+        locator = Locator(
+            by=By.XPATH,
+            # value='//div[@class="table-row js-order-row"][1]//div[@class="table-cell table-cell-action text-right"]'
+            #       '/span[@class="btn-collapse"]'
+            value='//div[@class="table-body"]/div[@class="table-row js-order-row"][1]/div[contains(text(), "Новый")]'
+        )
+        return BaseElement(
+            driver=self.driver,
+            locator=locator
+        )
+
+    @property
+    def order_delete(self):
+        """
+        Удалить заказ
+        :return:
+        """
+        locator = Locator(
+            by=By.XPATH,
+            value='//a[@class="btn btn-default js-btn js-btn-order-cancel"]'
+        )
+        return BaseElement(
+            driver=self.driver,
+            locator=locator
+        )
+
+    @property
+    def order_delete_confirm(self):
+        """
+        Удалить заказ
+        :return:
+        """
+        locator = Locator(
+            by=By.XPATH,
+            value='//div[@class="bootbox modal bootbox-confirm in"]//button[@class="btn btn-primary bootbox-accept"]'
+        )
+        return BaseElement(
+            driver=self.driver,
+            locator=locator
+        )
+
+    @property
+    def order_post_delete_confirm(self):
+        """
+        Удалить заказ
+        :return:
+        """
+        locator = Locator(
+            by=By.XPATH,
+            value='//div[@class="bootbox modal bootbox-alert in"]//button[@class="btn btn-primary bootbox-accept"]'
+        )
+        return BaseElement(
+            driver=self.driver,
+            locator=locator
+        )
+
+

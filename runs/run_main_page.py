@@ -4,8 +4,12 @@ from selenium.webdriver.support.wait import WebDriverWait
 # from pages.dm2_main_page import MainPage
 from runs.pages.main_page import MainPage
 from runs.pages.base.logger_config_ import warn, info, err, exc
+from runs.pages.base.logging_report import Logging, LogReport
 import time
 import random
+
+logging = Logging()
+log = logging.logger
 
 options = Options()
 browser = webdriver.Chrome(options=options)
