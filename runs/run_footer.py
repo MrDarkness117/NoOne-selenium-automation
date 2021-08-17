@@ -1,6 +1,5 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support import expected_conditions as EC
 from runs.pages.footer_main_page import FooterMainPage as Page
 from runs.pages.base.logging_report import LogReport, Logging
 import time

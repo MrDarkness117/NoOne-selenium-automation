@@ -33,6 +33,8 @@ class CoreElems(BasePage):
     def CLASS(self, tag, value):
         """
         Pseudo CLASS_NAME wrapper
+        :param tag: нужен для указания тэгов, либо более полных указателей
+        :param value: нужен для указания полного класса для поиска
         :return:
         """
         locator = Locator(by=By.XPATH, value='//{}[@class="{}"]'.format(tag, value))
