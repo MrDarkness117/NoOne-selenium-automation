@@ -3,10 +3,9 @@ import random
 from .base.locator import Locator
 from .base.base_page import BasePage
 from .base.base_element import BaseElement
-from selenium.webdriver.common.by import By
-from ._core import CoreElems
+from ._core import CoreLocators
 
-core = CoreElems(BasePage)
+core = CoreLocators(BasePage)
 XPATH = core.XPATH
 TEXT = core.TEXT
 CLASS = core.CLASS
@@ -22,7 +21,6 @@ class CatalogPage(BasePage):
     def gender_select(self):
         """
         Категории продуктов (женская, мужская, т.д.)
-        :param num:
         :return:
         """
 
@@ -32,7 +30,6 @@ class CatalogPage(BasePage):
     def gender_select_random(self):
         """
         Категории продуктов (женская, мужская, т.д.)
-        :param num:
         :return:
         """
 
@@ -55,3 +52,34 @@ class CatalogPage(BasePage):
         """
 
         return XPATH('//ul[@class="nav-primary"]/li[{}]'.format(random.randrange(len('//ul[@class="nav-primary"]//li'))))
+
+    @property
+    def button_grid_mode(self):
+        """
+        Кнопка смены отображения сетки товаров
+        :return:
+        """
+
+        return XPATH('//div[@class="btn-view btn-view-2"]')
+
+    def filter_category(self, num):
+        """
+        Фильтр категории
+        :return:
+        """
+        return XPATH("//div[@id='block-CATEGORY']//li[{}]".format(num))
+
+    def filter_brand(self, num):
+        """
+        Фильтр бренда (если доступен)
+        :return:
+        """
+        return XPATH("//div[@id='block-BRAND']//li[{}]".format(num))
+
+    def filter_size(self, num):
+        """
+        Фильтр размера (если доступен)
+        :return:
+        """
+        return XPATH("//div[@id='block-RAZMER']//li[{}]".format(num))
+

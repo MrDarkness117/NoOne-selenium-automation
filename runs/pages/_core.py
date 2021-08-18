@@ -4,7 +4,7 @@ from .base.base_element import BaseElement
 from selenium.webdriver.common.by import By
 
 
-class CoreElems(BasePage):
+class CoreLocators(BasePage):
 
     url = "https://noone.ru/"
 

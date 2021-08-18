@@ -2,9 +2,9 @@ from .base.locator import Locator
 from .base.base_page import BasePage
 from .base.base_element import BaseElement
 from selenium.webdriver.common.by import By
-from ._core import CoreElems
+from ._core import CoreLocators
 
-core = CoreElems(BasePage)
+core = CoreLocators(BasePage)
 XPATH = core.XPATH
 TEXT = core.TEXT
 CLASS = core.CLASS
