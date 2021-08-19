@@ -2,7 +2,21 @@ import datetime
 import os
 
 
+def return_testblock(cls_name):
+    """
+    Статический метод возвращающий имя класса для сохранения файлов
+    :param cls_name: Класс, имя которого мы должны получить
+    :return:
+    """
+    return cls_name.__class__.__name__
+
+
 class LogReport(object):
+    """
+    Составление отчетов о тестах. Действия сохраняются пошагово при помощи метода Logging().logger()
+    testblock - Имя класса теста. Как правило RunНазваниеБлока
+    logs - Вся сохраняемая информация о действиях драйвера
+    """
 
     def __init__(self, testblock, logs):
         self.testblock = testblock
@@ -12,15 +26,24 @@ class LogReport(object):
                          "РЕЗУЛЬТАТЫ ТЕСТИРОВАНИЯ: \n" \
                          "{}".format(datetime.datetime.now(), self.testblock, self.logs)
 
-    def return_testblock(self, cls_name):
-        return cls_name.__class__.__name__
-
     def test_results(self):
+        """
+        Сохранение результатов тестирования в отдельный файл с информацией сохраненной в __init__()
+
+        Использовать в блоке __name__ == '__main__' внизу файла run в следующем виде:
+        if __name__ == '__main__':
+            RunClass().test_run()
+            LogReport(testblock=RunClass(), logs=logging.log).test_results()
+        else:
+            LogReport(testblock=RunClass(), logs=logging.log).test_results()
+        где RunClass() - передаваемое название класса self.testblock для отчётов
+        :return:
+        """
         newpath = '.\\reports'
         if not os.path.exists(newpath):
             os.makedirs(newpath)
 
-        with open(".\\reports\\" + self.return_testblock(self.testblock) + ' ' +
+        with open(".\\reports\\" + return_testblock(self.testblock) + ' ' +
                   str(datetime.datetime.now()).replace(':', '-')[:-7] + "_" +
                   '_report.txt', 'w') as report:
             report.write(self.BASE_INFO)
@@ -28,10 +51,25 @@ class LogReport(object):
 
 
 class Logging(object):
+    """
+    Логгирование информации для блока LogReport().test_results()
+    """
     log = '=' * 90 + "\n"
     n = 0
 
     def logger(self, report):
+        """
+        Сохранение информации в виде пошаговых логов
+        Символы '/' и '=' говорят программе не сохранять эти логи как действия для воспроизведения,
+        а носят исключительно информативный характер. Знак = для информации и предупреждений, / для ошибок
+
+        Рекомендуется в начале файла run после импорта ставить следующие строки:
+        logging = Logging()
+        log = logging.logger
+        где log - метод для логгирования шагов, информации и ошибок
+        :param report: передаваемая информация
+        :return:
+        """
         if report[0] != '=':
             if report[0] != '/':
                 self.n += 1
@@ -40,3 +78,18 @@ class Logging(object):
                 self.log += report + '\n'
         else:
             self.log += report + '\n'
+
+
+class TakeScreenshot(object):
+
+    def __init__(self, driver, testblock):
+        self.driver = driver
+        self.testblock = testblock
+
+    def take_screenshot(self):
+        newpath = '.\\screenshots'
+        if not os.path.exists(newpath):
+            os.makedirs(newpath)
+        self.driver.save_screenshot('.\\screenshots\\' + return_testblock(self.testblock) + ' ' +
+                                    str(datetime.datetime.now()).replace(':', '-')[:-7] + "_" +
+                                    '_screenshot')

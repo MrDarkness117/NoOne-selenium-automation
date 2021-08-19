@@ -57,6 +57,7 @@ class CatalogPage(BasePage):
     def button_grid_mode(self):
         """
         Кнопка смены отображения сетки товаров
+        Меняет отображение div#catalog-items с .catalog-view-1 (по умолчанию) на .catalog-view-2
         :return:
         """
 
@@ -82,4 +83,68 @@ class CatalogPage(BasePage):
         :return:
         """
         return XPATH("//div[@id='block-RAZMER']//li[{}]".format(num))
+
+    def filter_color(self, num):
+        """
+        Фильтр цвета (если доступен)
+        :param num:
+        :return:
+        """
+
+        return XPATH("//div[@id='block-COLOR_GROUP']//ul[@class='filter-list filter-list-colors']//li[{}]".format(num))
+
+    def filter_season(self, num):
+        """
+        Фильтр сезонов (если доступен)
+        :param num:
+        :return:
+        """
+
+        return XPATH("//div[@id='block-SEASONALITY']//li[{}]".format(num))
+
+    def filter_collection(self, num):
+        """
+        Фильтр коллекции (если доступен)
+        :param num:
+        :return:
+        """
+
+        return XPATH("//div[@id='block-COLLECTION']//li[{}]".format(num))
+
+    def filter_model(self, num):
+        """
+        Фильтр моделей (если доступен)
+        :param num:
+        :return:
+        """
+
+        return XPATH("//div[@id='block-MODEL']//li[{}]".format(num))
+
+    def filter_basic_material(self, num):
+        """
+        Фильтр базового материала (если доступен)
+        :param num:
+        :return:
+        """
+
+        return XPATH("//div[@id='block-BASIC_MATERIAL']//li[{}]".format(num))
+
+    def filter_lining_material(self, num):
+        """
+        Фильтр материала подкладки (если доступен)
+        :param num:
+        :return:
+        """
+
+        return XPATH("//div[@id='block-LINING_MATERIAL']//li[{}]".format(num))
+
+    def filter_group(self, num):
+        """
+        Фильтр группы (если доступен)
+        :param num:
+        :return:
+        """
+
+        return XPATH("//div[@id='block-GROUP_REF']//li[{}]".format(num))
+
 
