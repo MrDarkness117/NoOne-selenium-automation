@@ -6,8 +6,6 @@ from selenium.webdriver.common.by import By
 
 class CoreLocators(BasePage):
 
-    url = "https://noone.ru/"
-
     def ID(self, value):
         """
         ID wrapper
@@ -30,7 +28,7 @@ class CoreLocators(BasePage):
             locator=locator
         )
 
-    def CLASS(self, tag, value):
+    def CLASS(self, value, tag='*'):
         """
         Pseudo CLASS_NAME wrapper
         :param tag: нужен для указания тэгов, либо более полных указателей

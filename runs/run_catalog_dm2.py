@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-from runs.pages.catalog_page import CatalogPage as Page
+from runs.pages.dm2_catalog_page import CatalogPage as Page
 from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
 import random
 import time
@@ -11,7 +11,7 @@ logging = Logging()
 log = logging.logger
 
 
-class RunCatalog(object):
+class RunCatalogDM2(object):
     # Настройки
 
     options = Options()
@@ -30,30 +30,38 @@ class RunCatalog(object):
 
         log("=" * 5 + "Начало тестирования.")
 
-        # try:
-        self.close_popups()
-        self.open_category()
-        self.catalog_view()
-        self.select_filters()
-        self.select_first_product()
-        # except:
-        #     log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10)
-        #     screenshot()
+        try:
+            self.close_popups()
+            self.open_category()
+            self.catalog_view()
+            self.select_filters()
+            self.select_first_product()
+            self.next_page()
+        except:
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10)
+            screenshot()
 
         log("=" * 5 + "Завершение тестирования.")
         self.driver.quit()
 
     def close_popups(self):
         log("=" * 5 + "Закрываю всплывающие окна")
-        self.noone.region_confirm.click()
-        self.noone.cookies.click()
+        try:
+            self.noone.cookies.click()
+            self.noone.region_select.click()
+            self.noone.region_select_moscow.click()
+        except:
+            log("=" * 5 + "Некоторые окна не были закрыты")
 
     def open_category(self):
         log("Перейти в произвольный раздел каталога.")
-        self.noone.gender_select_random(
-            random.randrange(1, len(self.driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li')))).click()
-        self.noone.category_select_random(
-            random.randrange(1, len(self.driver.find_elements_by_xpath('//ul[@class="nav-primary"]/li')))).click()
+        # self.noone.gender_select_random(
+        #     random.randrange(1, len(self.driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li')))).click()
+        self.noone.gender_select.click()
+        time.sleep(1)
+        self.noone.category_select.click()
+        # self.noone.category_select_random(
+        #     random.randrange(1, len(self.driver.find_elements_by_xpath('//ul[@class="nav-primary"]/li')))).click()
         log("=" * 5 + "URL: {}".format(self.driver.current_url))
 
     def catalog_view(self):
@@ -83,7 +91,6 @@ class RunCatalog(object):
 
     def select_filters(self):
         log("Раскрыть фильтры меню")
-        filters = None
         for i in self.driver.find_elements_by_xpath(
                 '//div[@class="filter-secondary filter-panel filter-panel-collapse filter-panel-open"]/div/div'):
             try:
@@ -101,27 +108,15 @@ class RunCatalog(object):
         filters = [
             self.noone.filter_category(
                 random.randrange(1, len(self.driver.find_elements_by_xpath(
-                    "//div[@id='block-CATEGORY']//li[@class='filter-item filter-item-default ']")), 1)
+                    "//div[@id='block-CATEGORY']//li[@class='filter-item filter-item-default']")), 1)
             ),
             self.noone.filter_brand(
                 random.randrange(1, len(self.driver.find_elements_by_xpath(
-                    "//div[@id='block-BRAND']//li[@class='filter-item filter-item-default ']")), 1)
-            ),
-            self.noone.filter_size(
-                random.randrange(1, len(self.driver.find_elements_by_xpath(
-                    "//div[@id='block-RAZMER']//li[@class='filter-item filter-item-default ']")), 1)
+                    "//div[@id='block-BRAND']//li[@class='filter-item filter-item-default']")), 1)
             ),
             self.noone.filter_color(
                 random.randrange(1, len(self.driver.find_elements_by_xpath(
-                    "//div[@id='block-COLOR_GROUP']//li[@class='filter-item filter-item-color ']")), 1)
-            ),
-            self.noone.filter_season(
-                random.randrange(1, len(self.driver.find_elements_by_xpath(
-                    "//div[@id='block-SEASONALITY']//li[@class='filter-item filter-item-default ']")), 1)
-            ),
-            self.noone.filter_collection(
-                random.randrange(1, len(self.driver.find_elements_by_xpath(
-                    "//div[@id='block-COLLECTION']//li[@class='filter-item filter-item-default ']")), 1)
+                    "//div[@id='block-COLOR_GROUP']//li[@class='filter-item filter-item-color']")), 1)
             ),
             # self.noone.filter_model(
             #     random.randrange(1, len(self.driver.find_elements_by_xpath(
@@ -143,9 +138,10 @@ class RunCatalog(object):
         for el in filters:
             print(el)
             try:
-                log("="*5 + "Тестирую {}".format(el))
+                log("=" * 5 + "Тестирую {}".format(el))
                 el.click()
-                WebDriverWait(self.driver, 10).until(EC.url_changes)
+                time.sleep(1)
+                # WebDriverWait(self.driver, 10).until(EC.url_changes)
             except:
                 log("/" * 10 + "ОШИБКА: Один из фильтров не был найден ({})! См. по ссылке".format(el) + "\\" * 10)
                 screenshot()
@@ -187,12 +183,12 @@ class RunCatalog(object):
 
 
 def screenshot():
-    TakeScreenshot(RunCatalog()).take_screenshot()
+    TakeScreenshot(RunCatalogDM2()).take_screenshot()
 
 
 if __name__ == '__main__':
     try:
-        RunCatalog().test_run()
-        LogReport(testblock=RunCatalog(), logs=logging.log).test_results()
+        RunCatalogDM2().test_run()
+        LogReport(testblock=RunCatalogDM2(), logs=logging.log).test_results()
     except:
-        LogReport(testblock=RunCatalog(), logs=logging.log).test_results()
+        LogReport(testblock=RunCatalogDM2(), logs=logging.log).test_results()

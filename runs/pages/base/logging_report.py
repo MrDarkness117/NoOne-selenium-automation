@@ -82,9 +82,9 @@ class Logging(object):
 
 class TakeScreenshot(object):
 
-    def __init__(self, driver, testblock):
-        self.driver = driver
+    def __init__(self, testblock):
         self.testblock = testblock
+        self.driver = testblock.driver
 
     def take_screenshot(self):
         newpath = '.\\screenshots'
@@ -92,4 +92,4 @@ class TakeScreenshot(object):
             os.makedirs(newpath)
         self.driver.save_screenshot('.\\screenshots\\' + return_testblock(self.testblock) + ' ' +
                                     str(datetime.datetime.now()).replace(':', '-')[:-7] + "_" +
-                                    '_screenshot')
+                                    '_screenshot.png')

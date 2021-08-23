@@ -16,7 +16,7 @@ from ._core import CoreLocators
 
 class CatalogPage(CoreLocators):
 
-    url = 'https://noone.ru'
+    url = "https://oneway:eehooXi8@dm2.noone.ru/"
 
     @property
     def cookies(self):
@@ -33,6 +33,22 @@ class CatalogPage(CoreLocators):
         :return:
         """
         return self.ID('region-confirm')
+
+    @property
+    def region_select(self):
+        """
+        Иногда регион не подтверждается
+        :return:
+        """
+        return self.CLASS('nav-item nav-item-region')
+
+    @property
+    def region_select_moscow(self):
+        """
+        Москва
+        :return:
+        """
+        return self.XPATH('//li[contains(@data-code, "77000000000")]')
 
     @property
     def open_filters(self):
