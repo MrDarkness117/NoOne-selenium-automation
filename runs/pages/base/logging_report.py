@@ -18,13 +18,16 @@ class LogReport(object):
     logs - Вся сохраняемая информация о действиях драйвера
     """
 
-    def __init__(self, testblock, logs):
+    def __init__(self, testblock, logs, mode='s'):
         self.testblock = testblock
         self.logs = logs
         self.BASE_INFO = "SELENIUM ТЕСТИРОВАНИЕ - ДАТА/ВРЕМЯ: {} \n" \
                          "БЛОК ТЕСТИРОВАНИЯ - {}\n" \
                          "РЕЗУЛЬТАТЫ ТЕСТИРОВАНИЯ: \n" \
                          "{}".format(datetime.datetime.now(), self.testblock, self.logs)
+        self.mode = mode
+        if mode == 'g':
+            self.BASE_INFO = ''
 
     def test_results(self):
         """
@@ -56,6 +59,14 @@ class Logging(object):
     """
     log = '=' * 90 + "\n"
     n = 0
+    start_message = ''
+
+    def start_msg(self, testblock):
+        if __name__ == '__main__':
+            self.start_message = "=" * 5 + "Начало тестирования."
+        else:
+            self.start_message = "=" * 5 + "Начало тестирования {}.".format(return_testblock(testblock))
+        return self.start_message
 
     def logger(self, report):
         """
@@ -93,3 +104,4 @@ class TakeScreenshot(object):
         self.driver.save_screenshot('.\\screenshots\\' + return_testblock(self.testblock) + ' ' +
                                     str(datetime.datetime.now()).replace(':', '-')[:-7] + "_" +
                                     '_screenshot.png')
+

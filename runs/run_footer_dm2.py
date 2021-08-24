@@ -1,6 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from runs.pages.footer_main_page import FooterMainPage as Page
+from runs.pages.footer_main_page_dm2 import FooterMainPage as Page
 from runs.pages.base.logging_report import LogReport, Logging
 import time
 
@@ -8,7 +8,7 @@ logging = Logging()
 log = logging.logger
 
 
-class RunFooter(object):
+class RunFooterDM2(object):
     # Настройки
 
     options = Options()
@@ -27,13 +27,14 @@ class RunFooter(object):
         if __name__ == '__main__':
             log("=" * 5 + "Начало тестирования.")
         else:
-            log("=" * 5 + "Начало тестирования {}".format(RunFooter().__class__.__name__))
+            log("=" * 5 + "Начало тестирования {}".format(RunFooterDM2().__class__.__name__))
 
         self.noone.cookies.click()
         self.nav_links()
 
         log('='*5 + "Завершение тестирования.")
         self.driver.quit()
+        LogReport(logs=logging.log, testblock=RunFooterDM2()).test_results()
 
     def nav_links(self):
         # for i in self.driver.find_elements_by_xpath("//footer//a[@class='nav-item']"):
@@ -47,7 +48,4 @@ class RunFooter(object):
 
 
 if __name__ == '__main__':
-    RunFooter().test_run()
-    LogReport(logs=logging.log, testblock=RunFooter()).test_results()
-else:
-    LogReport(logs=logging.log, testblock=RunFooter()).test_results()
+    RunFooterDM2().test_run()

@@ -242,3 +242,35 @@ class CatalogPage(CoreLocators):
         return self.XPATH(
             "//div[@class='pagination js-pagination']//ul[@class='pagination-list']//li//a[contains(text(), 'Вперед')]"
         )
+
+    @property
+    def sort_button(self):
+        """
+        Кнопка сортировки товаров
+        :return:
+        """
+        return self.XPATH('//div[@class="catalog-control catalog-control-sort"]//div[@class="dropdown"]/div/span')
+
+    @property
+    def sort_option_grow(self):
+        """
+        Опция возрастание
+        :return:
+        """
+        return self.XPATH('//div[@class="catalog-control catalog-control-sort"]//ul[@class="dropdown-menu-list"]//li[3]')
+
+    @property
+    def sort_option_shrink(self):
+        """
+        Опция возрастание
+        :return:
+        """
+        return self.XPATH('//div[@class="catalog-control catalog-control-sort"]//ul[@class="dropdown-menu-list"]//li[4]')
+
+    @property
+    def sort_option_discount(self):
+        """
+        Опция возрастание
+        :return:
+        """
+        return self.XPATH('//div[@class="catalog-control catalog-control-sort"]//ul[@class="dropdown-menu-list"]//li[5]')

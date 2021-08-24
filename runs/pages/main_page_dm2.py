@@ -7,7 +7,7 @@ import random
 
 class MainPage(BasePage):
 
-    url = "https://noone.ru/"
+    url = "https://oneway:eehooXi8@dm2.noone.ru/"
 
     '''
     Static Buttons
@@ -183,7 +183,7 @@ class MainPage(BasePage):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//div[@class="carousel"]'
+            value='//div[@id="promo"]//div[@class="carousel"]'
         )
         return BaseElement(
             driver=self.driver,

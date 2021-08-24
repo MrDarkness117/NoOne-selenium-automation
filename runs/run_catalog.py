@@ -28,7 +28,10 @@ class RunCatalog(object):
 
     def test_run(self):
 
-        log("=" * 5 + "Начало тестирования.")
+        if __name__ == '__main__':
+            log("=" * 5 + "Начало тестирования.")
+        else:
+            log("=" * 5 + "Начало тестирования {}.".format(RunCatalog().__class__.__name__))
 
         # try:
         self.close_popups()

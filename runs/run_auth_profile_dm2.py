@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
-from runs.pages.auth_profile_page import AuthProfilePage as Page
+from runs.pages.auth_profile_page_dm2 import AuthProfilePage as Page
 from runs.pages.base.logging_report import LogReport, Logging
 
 # log = '=' * 90 + "\n"
@@ -21,10 +21,10 @@ from runs.pages.base.logging_report import LogReport, Logging
 #         log += report + '\n'
 
 logging = Logging()
-log = logging.log
+log = logging.logger
 
 
-class RunAuthProfile(object):
+class RunAuthProfileDM2(object):
     # Настройки
 
     options = Options()
@@ -42,11 +42,7 @@ class RunAuthProfile(object):
 
     def test_run(self):
 
-        if __name__ == '__main__':
-            log("=" * 5 + "Начало тестирования.")
-        else:
-            log("=" * 5 + "Начало тестирования {}".format(RunAuthProfile().__class__.__name__))
-
+        log(test_start)
         # Стандартные действия
         self.noone.cookies.click()
         # self.noone.region_confirm.click()
@@ -58,13 +54,13 @@ class RunAuthProfile(object):
         self.cloth_size_select()
         self.accept_and_save()
         self.section_favs()
-        self.section_recs()
-        self.section_views()
+        # self.section_recs()  # отсутствуют товары
+        # self.section_views()  # отсутствуют товары
         self.open_sections()
 
         log('=' * 5 + "Завершение тестирования.")
         self.driver.quit()
-        LogReport(logs=log, testblock=RunAuthProfile()).test_results()
+        LogReport(logs=log, testblock=RunAuthProfileDM2()).test_results()
 
     # Команды
 
@@ -75,7 +71,7 @@ class RunAuthProfile(object):
     def auth_fields(self):
         auth_info = {
             'login': 'm.romantsov@noone.ru',
-            'password': 'mihailo'
+            'password': 'qK4%j8Wqy*'
         }
         log("Ввести логин/пароль, нажать 'войти'")
         self.noone.auth_field_login.input_text(auth_info['login'])
@@ -94,9 +90,12 @@ class RunAuthProfile(object):
 
     def accept_and_save(self):
         log("Принять условия и сохранить")
-        self.noone.save_checkbox.click()
-        self.noone.save.click()
-        self.noone.save_accept.click()
+        try:
+            self.noone.save_checkbox.click()
+            self.noone.save.click()
+            self.noone.save_accept.click()
+        except:
+            self.driver.execute_script('window.scrollBy(0, 100)')
 
     def open_sections(self):
         log("Проверка на открытие разделов")
@@ -143,7 +142,10 @@ class RunAuthProfile(object):
 
     def section_tests(self):
         log("Проверить раздел с товарами")
-        self.noone.items_frv.hover_center()
+        try:
+            self.noone.items_frv.hover_center()
+        except:
+            log("=" * 5 + "Нет товаров")
 
     def action_hover(self, img_el, find_el):
         log("Проверить блоки hover")
@@ -164,5 +166,9 @@ class RunAuthProfile(object):
             print("Ошибка работы элемента!")
 
 
+test_start = "=" * 5 + "Начало тестирования {}.".format(RunAuthProfileDM2().__class__.__name__)
+
+
 if __name__ == '__main__':
-    RunAuthProfile().test_run()
+    RunAuthProfileDM2().test_run()
+    test_start = "=" * 5 + "Начало тестирования."

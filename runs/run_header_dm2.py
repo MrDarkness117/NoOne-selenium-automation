@@ -3,7 +3,7 @@ import random
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 # from selenium.webdriver.support.wait import WebDriverWait
-from runs.pages.main_page import MainPage
+from runs.pages.main_page_dm2 import MainPage
 # from runs.pages.base.logger_config_ import warn, info, err, exc
 from runs.pages.base.logging_report import Logging, LogReport
 
@@ -15,8 +15,9 @@ logging = Logging()
 log = logging.logger
 
 options = Options()
+# options.add_argument("--window-position=-2000,0")
 driver = webdriver.Chrome(options=options)
-driver.set_window_position(0, 0)
+driver.set_window_position(-2000, 0)
 driver.maximize_window()
 driver.implicitly_wait(3)
 
@@ -40,16 +41,14 @@ noone.go()
 url = driver.current_url
 
 
-class RunHeader(object):
+class RunHeaderDM2(object):
 
     def test_run(self):
 
+        log(test_start)
+
         # Стандартные команды
 
-        if __name__ == '__main__':
-            log("=" * 5 + "Начало тестирования")
-        else:
-            log("=" * 5 + "Начало тестирования {}".format(RunHeader().__class__.__name__))
         try:
             noone.region_confirm.click()
         except:
@@ -70,25 +69,9 @@ class RunHeader(object):
                 log("="*5 + "Пробую код: {}".format(code))
                 noone.city_selector(code=code).click()
                 log("="*5 + "Город {}: Найден".format(city))
+                time.sleep(1)
             except:
                 log("/"*10 + "Город {}: Ошибка - элемент не найден!".format(city) + "\\"*10)
-                try:
-                    log("="*5 + "Пробую закрыть всплывающие окна")
-                    driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')
-
-                    # driver.switch_to.frame(driver.find_elements_by_css_selector("iframe[id='fl-513145']"))
-                    # print("Переключен на iframe")
-                    # driver.find_elements_by_xpath('//div[@class="widget__close js-collapse-login"]').click()
-                    # print("iframe закрыт")
-                    # driver.switch_to.default_content()
-
-                    noone.city_menu.click()
-                    log("="*5 + "Пробую код: {}".format(code))
-                    noone.city_selector(code=code).click()
-                    log("="*5 + "Город {}: Найден".format(city))
-
-                except:
-                    log("/"*10 + "Критическая ошибка." + "\\"*10)
 
             # try:
             #     WebDriverWait(driver, 4).until(lambda driver: driver.current_url != url)
@@ -132,22 +115,31 @@ class RunHeader(object):
                                                  )).click()
         except:
             log("="*5 + "Пробую закрыть всплывающие окна")
-            driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')
+
+            try:
+                driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')
+            except:
+                log("=" * 5 + "Невозможно выполнить скрипт, пропускаю шаг")
             log("="*5 + "Окно закрыто.")
 
-            noone.gender_select(random.randint(1, len(driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li'))
-                                               )).click()
+            # noone.gender_select(random.randint(1, len(driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li'))
+            #                                    )).click()
+            # time.sleep(1)
+            # noone.category_select(random.randint(1, len(driver.find_elements_by_tag_name('ul.nav-primary > li'))
+            #                                      )).click()
+            noone.gender_select(2)
             time.sleep(1)
-            noone.category_select(random.randint(1, len(driver.find_elements_by_tag_name('ul.nav-primary > li'))
-                                                 )).click()
+            noone.category_select(1)
 
         log("="*5 + "Завершение тестирования.")
         time.sleep(2)
         driver.quit()
+        LogReport(testblock=RunHeaderDM2(), logs=logging.log).test_results()
+
+
+test_start = "=" * 5 + "Начало тестирования {}.".format(RunHeaderDM2().__class__.__name__)
 
 
 if __name__ == '__main__':
-    RunHeader().test_run()
-    LogReport(testblock=RunHeader(), logs=logging.log).test_results()
-else:
-    LogReport(testblock=RunHeader(), logs=logging.log).test_results()
+    RunHeaderDM2().test_run()
+    test_start = "=" * 5 + "Начало тестирования."

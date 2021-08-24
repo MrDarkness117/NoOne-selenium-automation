@@ -4,14 +4,14 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
-from runs.pages.cart_page import CartPage as Page
+from runs.pages.cart_page_dm2 import CartPage
 from runs.pages.base.logging_report import Logging, LogReport
 
 logging = Logging()
 log = logging.logger
 
 
-class RunCart(object):
+class RunCartDM2(object):
 
     # Настройки
 
@@ -23,7 +23,7 @@ class RunCart(object):
 
     # Запуск
 
-    noone = Page(driver=driver)
+    noone = CartPage(driver=driver)
     noone.go()
     url = driver.current_url
 
@@ -31,42 +31,42 @@ class RunCart(object):
 
         log(test_start)
 
-        try:
-            # Стандартные действия
-            self.noone.region_confirm.click()
-            self.noone.cookies.click()
+        # try:
+        # Стандартные действия
+        self.noone.region_confirm.click()
+        self.noone.cookies.click()
 
-            # Действия Cart Page
-            self.auth()
-            self.auth_fields()
-            self.logo()
-            self.cart_click()
-            self.product_recommended_hover()
-            self.preview_click()
-            self.item_size_block_click()
-            self.item_size_click()
-            self.item_add_click()
-            self.accept_click()
-            self.surname_enter()
-            self.city_select_click()
-            self.city_select_element_click()
-            self.form_check_deselect()
-            self.form_info()
-            self.delivery_click()
-            self.delivery_date_click()
-            self.delivery_date_select_click()
-            self.payment_method_click()
-            self.order_comment_click()
-            self.order_comment_text()
-            self.order_btn()
-            self.cancel_order()
-        except:
-            log("/"*10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\"*10)
+        # Действия Cart Page
+        self.auth()
+        self.auth_fields()
+        self.logo()
+        self.cart_click()
+        self.product_recommended_hover()  # Отличается от стабильной версии
+        # self.preview_click()  # эти действия не нужны в случае dm2
+        # self.item_size_block_click()
+        # self.item_size_click()
+        # self.item_add_click()
+        # self.accept_click()
+        self.surname_enter()
+        self.city_select_click()
+        self.city_select_element_click()
+        self.form_check_deselect()
+        self.form_info()
+        self.delivery_click()
+        self.delivery_date_click()
+        self.delivery_date_select_click()
+        self.payment_method_click()
+        self.order_comment_click()
+        self.order_comment_text()
+        self.order_btn()
+        self.cancel_order()
+        # except:
+        #     log("/"*10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\"*10)
 
         log("="*5 + "Завершение тестирования.")
 
         self.driver.quit()
-        LogReport(testblock=RunCart(), logs=logging.log).test_results()
+        LogReport(testblock=RunCartDM2(), logs=logging.log).test_results()
 
     # Команды
 
@@ -77,7 +77,7 @@ class RunCart(object):
     def auth_fields(self):
         auth_info = {
             'login': 'm.romantsov@noone.ru',
-            'password': 'mihailo'
+            'password': 'qK4%j8Wqy*'
         }
         self.noone.auth_field_login.input_text(auth_info['login'])
         self.noone.auth_field_pass.input_text(auth_info['password'])
@@ -94,14 +94,19 @@ class RunCart(object):
 
     def product_recommended_hover(self):
         try:
-            self.noone.dy_product_card.hover_center()
-            log("Навести мышкой на товар снизу из списка")
-        except:
-            log('='*5 + "(?) Корзина уже не пустая. Удаляем товары.")
+            log('='*5 + "Проверка наличия товаров в корзине. Удаляем товары если есть.")
             self.noone.item_delete(1).click()
+        except:
             # self.cart_click()
-            log("Навести мышкой на товар снизу из списка")
-            self.noone.dy_product_card.hover_center()
+            log("=" * 5 + "DM2: Нет рекомендаций на странице, добавить товары самостоятально.")
+            self.noone.go_back()
+            self.driver.find_element_by_xpath('//ul[contains(@class, "nav-primary") and contains(@data-gender, "F")]/li[1]').click()
+            self.noone.alt_buy_item_hover.hover_center()
+            self.driver.find_element_by_xpath('//div[@class="btn btn-primary js-add-to-cart"]').click()
+            self.driver.find_element_by_xpath('//ul[@id="size-list"]/li[1]').click()
+            self.driver.find_element_by_xpath('//div[@id="add-to-cart"]').click()
+            self.driver.find_element_by_xpath('//button[@class="btn btn-primary bootbox-accept"]').click()
+            self.noone.cart.click()
 
     def preview_click(self):
         self.noone.dy_product_window.click()
@@ -236,15 +241,9 @@ class RunCart(object):
     log('='*5 + "Проверка оформления заказа")
 
 
-test_start = "=" * 5 + "Начало тестирования {}.".format(RunCart().__class__.__name__)
+test_start = "=" * 5 + "Начало тестирования {}.".format(RunCartDM2().__class__.__name__)
 
 
 if __name__ == '__main__':
-    RunCart().test_run()
+    RunCartDM2().test_run()
     test_start = "=" * 5 + "Начало тестирования."
-
-    # try:
-    #     RunCart().test_run()
-    # except:
-    #     print("Пробую закрыть всплывающие окна")
-    #     RunCart().driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')

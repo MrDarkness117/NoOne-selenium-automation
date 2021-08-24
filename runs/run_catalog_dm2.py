@@ -6,6 +6,7 @@ from runs.pages.dm2_catalog_page import CatalogPage as Page
 from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
 import random
 import time
+import re
 
 logging = Logging()
 log = logging.logger
@@ -28,7 +29,7 @@ class RunCatalogDM2(object):
 
     def test_run(self):
 
-        log("=" * 5 + "Начало тестирования.")
+        log(test_start)
 
         try:
             self.close_popups()
@@ -37,12 +38,14 @@ class RunCatalogDM2(object):
             self.select_filters()
             self.select_first_product()
             self.next_page()
+            self.sort_test()
         except:
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10)
             screenshot()
 
         log("=" * 5 + "Завершение тестирования.")
         self.driver.quit()
+        LogReport(testblock=RunCatalogDM2(), logs=logging.log).test_results()
 
     def close_popups(self):
         log("=" * 5 + "Закрываю всплывающие окна")
@@ -181,14 +184,46 @@ class RunCatalogDM2(object):
         except:
             log("/" * 10 + "Кнопки 'Вперед' нет, либо не работает пагинация" + "\\" * 10)
 
+    def sort_test(self):
+        self.open_category()
+        log("Проверить сортировку товаров")
+        self.noone.sort_button.click()
+        self.noone.sort_option_grow.click()
+        self._sort_compare('item-price', "span[@class='item-price-new text-data']")
+        self.noone.sort_button.click()
+        self.noone.sort_option_shrink.click()
+        self._sort_compare('item-price', "span[@class='item-price-new text-data']")
+        self.noone.sort_button.click()
+        self.noone.sort_option_discount.click()
+        self._sort_compare('item-label-list', "div[@class='item-label item-label-discount']")
+
+    def _sort_compare(self, classinfo, item):
+        """
+        Сравнивает получаемые значения полей
+        :param classinfo:
+        :param item:
+        :return:
+        """
+        compare = []
+        n = 1
+        for el in self.driver.find_elements_by_xpath('//div[@id="catalog-items"]//div[@class="col lg:col-4 xs:col-6"]'):
+            element = self.driver.find_element_by_xpath(
+                '//div[@id="catalog-items"]//div[@class="col lg:col-4 xs:col-6"][{}]//div[@class="{}"]//{}'
+                    .format(n, classinfo, item))
+            compare.append(int(re.sub('[^0-9]', '', element.text)))
+            n += 1
+        print(compare)
+        return log("="*5 + 'Первый товар > последний: {}'.format(compare[0] < compare[-1]))
+
 
 def screenshot():
     TakeScreenshot(RunCatalogDM2()).take_screenshot()
 
 
+test_start = "=" * 5 + "Начало тестирования {}.".format(RunCatalogDM2().__class__.__name__)
+
+
 if __name__ == '__main__':
-    try:
-        RunCatalogDM2().test_run()
-        LogReport(testblock=RunCatalogDM2(), logs=logging.log).test_results()
-    except:
-        LogReport(testblock=RunCatalogDM2(), logs=logging.log).test_results()
+    RunCatalogDM2().test_run()
+    test_start = "=" * 5 + "Начало тестирования."
+
