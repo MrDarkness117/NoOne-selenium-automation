@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-from runs.pages.dm2_catalog_page import CatalogPage as Page
+from runs.pages.catalog_page_dm2 import CatalogPage as Page
 from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
 import random
 import time
@@ -39,8 +39,8 @@ class RunCatalogDM2(object):
             self.select_first_product()
             self.next_page()
             self.sort_test()
-        except:
-            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10)
+        except Exception as e:
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
             screenshot()
 
         log("=" * 5 + "Завершение тестирования.")
@@ -196,6 +196,15 @@ class RunCatalogDM2(object):
         self.noone.sort_button.click()
         self.noone.sort_option_discount.click()
         self._sort_compare('item-label-list', "div[@class='item-label item-label-discount']")
+
+    def favs(self):
+        log("Проверить работу кнопки \"Добавить в избранное\"")
+        self.open_category()
+        self.noone.catalog_item.hover_center()
+        log("=" * 5 + 'Добавить товар в избранное')
+        self.noone.catalog_item_fav.click()
+        log("=" * 5 + "Убрать товар из избранного")
+        self.noone.catalog_item_fav.click()
 
     def _sort_compare(self, classinfo, item):
         """

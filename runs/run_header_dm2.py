@@ -5,7 +5,7 @@ from selenium.webdriver.chrome.options import Options
 # from selenium.webdriver.support.wait import WebDriverWait
 from runs.pages.main_page_dm2 import MainPage
 # from runs.pages.base.logger_config_ import warn, info, err, exc
-from runs.pages.base.logging_report import Logging, LogReport
+from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
 
 import time
 
@@ -50,86 +50,90 @@ class RunHeaderDM2(object):
         # Стандартные команды
 
         try:
-            noone.region_confirm.click()
-        except:
-            log("="*5 + "No region requested")
-
-        try:
-            noone.cookies.click()
-        except:
-            log("="*5 + "No cookies requested")
-
-        # Команды тестирования шапки
-
-        log("Проверить загрузку городов")
-        for city, code in city_list.items():
-            log("="*5 + "Проверка загрузки города {}".format(city))
             try:
-                noone.city_menu.click()
-                log("="*5 + "Пробую код: {}".format(code))
-                noone.city_selector(code=code).click()
-                log("="*5 + "Город {}: Найден".format(city))
-                time.sleep(1)
+                noone.region_confirm.click()
             except:
-                log("/"*10 + "Город {}: Ошибка - элемент не найден!".format(city) + "\\"*10)
+                log("="*5 + "No region requested")
 
-            # try:
-            #     WebDriverWait(driver, 4).until(lambda driver: driver.current_url != url)
-            # except:
-            #     print("Ошибка загрузки страницы!")
+            try:
+                noone.cookies.click()
+            except:
+                log("="*5 + "No cookies requested")
 
-        log("="*5 + "Проверка городов завершена!")
-        try:
-            log("Перейти на страницу авторизации")
-            noone.auth_link.click()
-        except:
-            log("/"*10 + "Ошибка перехода на страницу авторизации!" + "\\"*10)
-        log("Проверить загрузку страницы по логотипу")
-        noone.logo.click()
-        # WebDriverWait(driver, 15).until(lambda driver: driver.current_url == "https://noone.ru")
-        log("Проверить поле ввода текста")
-        noone.search_input.input_text(search_value)
-        log("="*5 + "Поиск по '{}'".format(search_value))
-        noone.search_btn.click()
+            # Команды тестирования шапки
 
-        time.sleep(3)
+            log("Проверить загрузку городов")
+            for city, code in city_list.items():
+                log("="*5 + "Проверка загрузки города {}".format(city))
+                try:
+                    noone.city_menu.click()
+                    log("="*5 + "Пробую код: {}".format(code))
+                    noone.city_selector(code=code).click()
+                    log("="*5 + "Город {}: Найден".format(city))
+                    time.sleep(1)
+                except:
+                    log("/"*10 + "Город {}: Ошибка - элемент не найден!".format(city) + "\\"*10)
 
-        try:
-            log("Проверить работу по переходу в корзину")
-            noone.cart.click()
+                # try:
+                #     WebDriverWait(driver, 4).until(lambda driver: driver.current_url != url)
+                # except:
+                #     print("Ошибка загрузки страницы!")
+
+            log("="*5 + "Проверка городов завершена!")
+            try:
+                log("Перейти на страницу авторизации")
+                noone.auth_link.click()
+            except:
+                log("/"*10 + "Ошибка перехода на страницу авторизации!" + "\\"*10)
+            log("Проверить загрузку страницы по логотипу")
+            noone.logo.click()
+            # WebDriverWait(driver, 15).until(lambda driver: driver.current_url == "https://noone.ru")
+            log("Проверить поле ввода текста")
+            noone.search_input.input_text(search_value)
+            log("="*5 + "Поиск по '{}'".format(search_value))
+            noone.search_btn.click()
+
             time.sleep(3)
-            log("="*5 + "Успех, возврат на главную страницу")
-        except:
-            log("/"*10 + "Ошибка перехода в корзину!" + "\\"*10)
-        try:
-            noone.logo_basket.click()
-        except:
-            log("="*5 + "Пробую закрыть всплывающие окна")
-            driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')
-            noone.logo_basket.click()
-
-        try:
-            noone.gender_select(random.randint(1, len(driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li'))
-                                               )).click()
-            noone.category_select(random.randint(1, len(driver.find_elements_by_tag_name('ul.nav-primary > li'))
-                                                 )).click()
-        except:
-            log("="*5 + "Пробую закрыть всплывающие окна")
 
             try:
-                driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')
+                log("Проверить работу по переходу в корзину")
+                noone.cart.click()
+                time.sleep(3)
+                log("="*5 + "Успех, возврат на главную страницу")
             except:
-                log("=" * 5 + "Невозможно выполнить скрипт, пропускаю шаг")
-            log("="*5 + "Окно закрыто.")
+                log("/"*10 + "Ошибка перехода в корзину!" + "\\"*10)
+            try:
+                noone.logo_basket.click()
+            except:
+                log("="*5 + "Пробую закрыть всплывающие окна")
+                driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')
+                noone.logo_basket.click()
 
-            # noone.gender_select(random.randint(1, len(driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li'))
-            #                                    )).click()
-            # time.sleep(1)
-            # noone.category_select(random.randint(1, len(driver.find_elements_by_tag_name('ul.nav-primary > li'))
-            #                                      )).click()
-            noone.gender_select(2)
-            time.sleep(1)
-            noone.category_select(1)
+            try:
+                noone.gender_select(random.randint(1, len(driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li'))
+                                                   )).click()
+                noone.category_select(random.randint(1, len(driver.find_elements_by_tag_name('ul.nav-primary > li'))
+                                                     )).click()
+            except:
+                log("="*5 + "Пробую закрыть всплывающие окна")
+
+                try:
+                    driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')
+                except:
+                    log("=" * 5 + "Невозможно выполнить скрипт, пропускаю шаг")
+                log("="*5 + "Окно закрыто.")
+
+                # noone.gender_select(random.randint(1, len(driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li'))
+                #                                    )).click()
+                # time.sleep(1)
+                # noone.category_select(random.randint(1, len(driver.find_elements_by_tag_name('ul.nav-primary > li'))
+                #                                      )).click()
+                noone.gender_select(2)
+                time.sleep(1)
+                noone.category_select(1)
+        except Exception as e:
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            TakeScreenshot(RunHeader()).take_screenshot()
 
         log("="*5 + "Завершение тестирования.")
         time.sleep(2)

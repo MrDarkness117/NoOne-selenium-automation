@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from runs.pages.footer_main_page_dm2 import FooterMainPage as Page
-from runs.pages.base.logging_report import LogReport, Logging
+from runs.pages.base.logging_report import LogReport, Logging, TakeScreenshot
 import time
 
 logging = Logging()
@@ -29,8 +29,12 @@ class RunFooterDM2(object):
         else:
             log("=" * 5 + "Начало тестирования {}".format(RunFooterDM2().__class__.__name__))
 
-        self.noone.cookies.click()
-        self.nav_links()
+        try:
+            self.noone.cookies.click()
+            self.nav_links()
+        except Exception as e:
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            TakeScreenshot(RunFooterDM2()).take_screenshot()
 
         log('='*5 + "Завершение тестирования.")
         self.driver.quit()

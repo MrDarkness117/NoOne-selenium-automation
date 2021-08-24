@@ -5,7 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 from runs.pages.cart_page_dm2 import CartPage
-from runs.pages.base.logging_report import Logging, LogReport
+from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
 
 logging = Logging()
 log = logging.logger
@@ -31,37 +31,38 @@ class RunCartDM2(object):
 
         log(test_start)
 
-        # try:
-        # Стандартные действия
-        self.noone.region_confirm.click()
-        self.noone.cookies.click()
+        try:
+            # Стандартные действия
+            self.noone.region_confirm.click()
+            self.noone.cookies.click()
 
-        # Действия Cart Page
-        self.auth()
-        self.auth_fields()
-        self.logo()
-        self.cart_click()
-        self.product_recommended_hover()  # Отличается от стабильной версии
-        # self.preview_click()  # эти действия не нужны в случае dm2
-        # self.item_size_block_click()
-        # self.item_size_click()
-        # self.item_add_click()
-        # self.accept_click()
-        self.surname_enter()
-        self.city_select_click()
-        self.city_select_element_click()
-        self.form_check_deselect()
-        self.form_info()
-        self.delivery_click()
-        self.delivery_date_click()
-        self.delivery_date_select_click()
-        self.payment_method_click()
-        self.order_comment_click()
-        self.order_comment_text()
-        self.order_btn()
-        self.cancel_order()
-        # except:
-        #     log("/"*10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\"*10)
+            # Действия Cart Page
+            self.auth()
+            self.auth_fields()
+            self.logo()
+            self.cart_click()
+            self.product_recommended_hover()  # Отличается от стабильной версии
+            # self.preview_click()  # эти действия не нужны в случае dm2
+            # self.item_size_block_click()
+            # self.item_size_click()
+            # self.item_add_click()
+            # self.accept_click()
+            self.surname_enter()
+            self.city_select_click()
+            self.city_select_element_click()
+            self.form_check_deselect()
+            self.form_info()
+            self.delivery_click()
+            self.delivery_date_click()
+            self.delivery_date_select_click()
+            self.payment_method_click()
+            self.order_comment_click()
+            self.order_comment_text()
+            self.order_btn()
+            self.cancel_order()
+        except Exception as e:
+            log("/"*10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\"*10 + "\nОшибка: {}".format(e))
+            TakeScreenshot(RunCartDM2()).take_screenshot()
 
         log("="*5 + "Завершение тестирования.")
 

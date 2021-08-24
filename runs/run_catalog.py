@@ -34,15 +34,15 @@ class RunCatalog(object):
         else:
             log("=" * 5 + "Начало тестирования {}.".format(RunCatalog().__class__.__name__))
 
-        # try:
-        self.close_popups()
-        self.open_category()
-        self.catalog_view()
-        self.select_filters()
-        self.select_first_product()
-        # except:
-        #     log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10)
-        #     screenshot()
+        try:
+            self.close_popups()
+            self.open_category()
+            self.catalog_view()
+            self.select_filters()
+            self.select_first_product()
+        except Exception as e:
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            screenshot()
 
         log("=" * 5 + "Завершение тестирования.")
         self.driver.quit()
@@ -202,6 +202,15 @@ class RunCatalog(object):
         self.noone.sort_button.click()
         self.noone.sort_option_discount.click()
         self._sort_compare('item-label-list', "div[@class='item-label item-label-discount']")
+
+    def favs(self):
+        log("Проверить работу кнопки \"Добавить в избранное\"")
+        self.open_category()
+        self.noone.catalog_item.hover_center()
+        log("=" * 5 + 'Добавить товар в избранное')
+        self.noone.catalog_item_fav.click()
+        log("=" * 5 + "Убрать товар из избранного")
+        self.noone.catalog_item_fav.click()
 
     def _sort_compare(self, classinfo, item):
         """

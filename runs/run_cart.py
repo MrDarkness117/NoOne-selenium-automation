@@ -5,7 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 from runs.pages.cart_page import CartPage as Page
-from runs.pages.base.logging_report import Logging, LogReport
+from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
 
 logging = Logging()
 log = logging.logger
@@ -60,8 +60,9 @@ class RunCart(object):
             self.order_comment_text()
             self.order_btn()
             self.cancel_order()
-        except:
-            log("/"*10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\"*10)
+        except Exception as e:
+            log("/"*10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\"*10 + "\nОшибка: {}".format(e))
+            TakeScreenshot(RunCart()).take_screenshot()
 
         log("="*5 + "Завершение тестирования.")
 

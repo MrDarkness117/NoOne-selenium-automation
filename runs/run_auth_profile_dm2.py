@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from runs.pages.auth_profile_page_dm2 import AuthProfilePage as Page
-from runs.pages.base.logging_report import LogReport, Logging
+from runs.pages.base.logging_report import LogReport, Logging, TakeScreenshot
 
 # log = '=' * 90 + "\n"
 # n = 0
@@ -44,19 +44,23 @@ class RunAuthProfileDM2(object):
 
         log(test_start)
         # Стандартные действия
-        self.noone.cookies.click()
-        # self.noone.region_confirm.click()
+        try:
+            self.noone.cookies.click()
+            # self.noone.region_confirm.click()
 
-        # Действия Cart Page
-        self.auth()
-        self.auth_fields()
-        self.foot_size_select()
-        self.cloth_size_select()
-        self.accept_and_save()
-        self.section_favs()
-        # self.section_recs()  # отсутствуют товары
-        # self.section_views()  # отсутствуют товары
-        self.open_sections()
+            # Действия Cart Page
+            self.auth()
+            self.auth_fields()
+            self.foot_size_select()
+            self.cloth_size_select()
+            self.accept_and_save()
+            self.section_favs()
+            # self.section_recs()  # отсутствуют товары
+            # self.section_views()  # отсутствуют товары
+            self.open_sections()
+        except Exception as e:
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            TakeScreenshot(RunAuthProfileDM2()).take_screenshot()
 
         log('=' * 5 + "Завершение тестирования.")
         self.driver.quit()

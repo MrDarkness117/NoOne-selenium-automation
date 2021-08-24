@@ -179,6 +179,15 @@ class CatalogPage(CoreLocators):
         return self.XPATH("//div[@id='catalog-items']//div[@class='col lg:col-4 xs:col-6'][1]")
 
     @property
+    def catalog_item_fav(self):
+        """
+        Кнопка "Добавить в избранное"
+        :return:
+        """
+        return self.XPATH("//div[@id='catalog-items']//div[@class='col lg:col-4 xs:col-6'][1]"
+                          "//div[@class='btn btn-action btn-item-favorite js-item-favorite']")
+
+    @property
     def item_preview(self):
 
         return self.XPATH('//div[@id="catalog-items"]//div[@class="col lg:col-4 xs:col-6"][1]'
