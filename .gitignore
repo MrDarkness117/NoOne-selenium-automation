@@ -6,3 +6,4 @@
 *.log
 /runs/reports/*.txt
 *.png
+/runs/run_dm2.bat
