@@ -213,7 +213,7 @@ class RunCatalogDM2(object):
             compare.append(int(re.sub('[^0-9]', '', element.text)))
             n += 1
         print(compare)
-        return log("="*5 + 'Первый товар > последний: {}'.format(compare[0] < compare[-1]))
+        return log("="*5 + 'Первый товар > последний: {}'.format(compare[0] > compare[-1]))
 
 
 def screenshot():

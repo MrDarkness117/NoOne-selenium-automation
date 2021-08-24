@@ -221,7 +221,7 @@ class RunCart(object):
         self.noone.profile_my_orders.click()
         log("Открыть окно заказа")
         try:
-            for i in range(1, 100):
+            for i in range(1, 60):
                 self.noone.profile_my_orders_open_order.click()
                 log("Удалить заказ")
                 self.noone.order_delete.click()
