@@ -98,9 +98,9 @@ class RunMainPageDM2(object):
         LogReport(testblock=RunMainPageDM2(), logs=logging.log).test_results()
 
 
-test_start = "Начало тестирования {}.".format(RunMainPageDM2().__class__.__name__)
+test_start = "=" * 5 + "Начало тестирования {}.".format(RunMainPageDM2().__class__.__name__)
 
 
 if __name__ == '__main__':
     RunMainPageDM2().test_run()
-    test_start = "Начало тестирования."
+    test_start = "=" * 5 + "Начало тестирования."

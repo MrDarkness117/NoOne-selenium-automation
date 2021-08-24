@@ -7,6 +7,7 @@ from runs import \
     run_cart_dm2 as cart
 from threading import Thread
 from runs.pages.base.logging_report import Logging, LogReport
+import pytest
 
 logging = Logging()
 log = logging.logger
@@ -24,6 +25,7 @@ logs = [f.log, h.log, c.log, p.log, m.log]
 # TODO: Имплементировать параллельное тестирование для быстрых тестов
 class RunsDM2(object):
 
+    # @pytest.fixture(scope='session')
     def test_runs(self):
 
         log("=" * 28 + " Запуск глобального тестирования " + "=" * 29)
@@ -33,12 +35,19 @@ class RunsDM2(object):
         Thread(target=p.RunAuthProfileDM2().test_run()).start()
         Thread(target=m.RunMainPageDM2().test_run()).start()
         Thread(target=ca.RunCartDM2().test_run()).start()
+        # f.RunFooterDM2().test_run()
+        # h.RunHeaderDM2().test_run()
+        # c.RunCatalogDM2().test_run()
+        # p.RunAuthProfileDM2().test_run()
+        # m.RunMainPageDM2().test_run()
+        # ca.RunCartDM2().test_run()
         for r in runs:
             log(r.logging.log)
 
         log("=" * 29 + " Конец глобального тестирования " + "=" * 29)
 
         LogReport(RunsDM2(), logs=logging.log).test_results()
+        return logging.log
 
 
 if __name__ == '__main__':

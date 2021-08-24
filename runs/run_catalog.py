@@ -46,6 +46,7 @@ class RunCatalog(object):
 
         log("=" * 5 + "Завершение тестирования.")
         self.driver.quit()
+        LogReport(testblock=RunCatalog(), logs=logging.log).test_results()
 
     def close_popups(self):
         log("=" * 5 + "Закрываю всплывающие окна")
@@ -225,9 +226,9 @@ def screenshot():
     TakeScreenshot(RunCatalog()).take_screenshot()
 
 
+test_start = "=" * 5 + "Начало тестирования {}.".format(RunFooter().__class__.__name__)
+
+
 if __name__ == '__main__':
-    try:
-        RunCatalog().test_run()
-        LogReport(testblock=RunCatalog(), logs=logging.log).test_results()
-    except:
-        LogReport(testblock=RunCatalog(), logs=logging.log).test_results()
+    RunCatalog().test_run()
+    test_start = "=" * 5 + "Начало тестирования."
