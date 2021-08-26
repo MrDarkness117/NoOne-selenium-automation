@@ -1,11 +1,11 @@
 from .base.locator import Locator
-from .base.base_page import BasePage
 from .base.base_element import BaseElement
+from ._core import CoreLocators
 from selenium.webdriver.common.by import By
 import random
 
 
-class CartPage(BasePage):
+class CartPage(CoreLocators):
 
     url = "https://noone.ru/"
     # url_dm2 = "https://dm2.noone.ru/"
@@ -180,6 +180,31 @@ class CartPage(BasePage):
             driver=self.driver,
             locator=locator
         )
+
+
+    @property
+    def item_color_block(self):
+        """
+        Блок выбора цвета товара
+        :return:
+        """
+        return self.XPATH('//div[@class="select item-color-list js-item-list"]//div[@class="select-value"]')
+
+    @property
+    def item_color_element(self):
+        """
+        Блок выбора цвета товара
+        :return:
+        """
+        return self.XPATH('//div[@class="select item-color-list js-item-list select-open"]//ul[@class="select-list"]/li[@class="select-item"][1]')
+
+    @property
+    def item_color_element_single(self):
+        """
+        Блок выбора цвета товара
+        :return:
+        """
+        return self.XPATH('//div[@class="select item-color-list js-item-list select-open"]//ul[@class="select-list"]/li[1]')
 
     @property
     def item_size_block(self):
@@ -391,7 +416,7 @@ class CartPage(BasePage):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//div[@class="order-step"]//div[contains(text(), "Сбербанк")]'
+            value='//div[@class="order-step"]//span[contains(text(), "Онлайн")]'
         )
         return BaseElement(
             driver=self.driver,

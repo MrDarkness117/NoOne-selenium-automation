@@ -33,13 +33,10 @@ class LogReport(object):
         """
         Сохранение результатов тестирования в отдельный файл с информацией сохраненной в __init__()
 
-        Использовать в блоке __name__ == '__main__' внизу файла run в следующем виде:
-        if __name__ == '__main__':
-            RunClass().test_run()
+        Использовать в блоке каждого тест кейса в самом конце:
             LogReport(testblock=RunClass(), logs=logging.log).test_results()
-        else:
-            LogReport(testblock=RunClass(), logs=logging.log).test_results()
-        где RunClass() - передаваемое название класса self.testblock для отчётов
+
+        где RunClass() - пример передаваемого название класса self.testblock для отчётов
         :return:
         """
         newpath = '.\\reports'
@@ -75,8 +72,8 @@ class Logging(object):
         а носят исключительно информативный характер. Знак = для информации и предупреждений, / для ошибок
 
         Рекомендуется в начале файла run после импорта ставить следующие строки:
-        logging = Logging()
-        log = logging.logger
+            logging = Logging()
+            log = logging.logger
         где log - метод для логгирования шагов, информации и ошибок
         :param report: передаваемая информация
         :return:
@@ -92,12 +89,20 @@ class Logging(object):
 
 
 class TakeScreenshot(object):
+    """
+    Сохранение скриншотов
+    """
 
     def __init__(self, testblock):
         self.testblock = testblock
         self.driver = testblock.driver
 
     def take_screenshot(self):
+        """
+        Использовать только с Selenium WebDriver
+        Сохранить скриншот с именем self.testblock
+        :return:
+        """
         newpath = '.\\screenshots'
         if not os.path.exists(newpath):
             os.makedirs(newpath)

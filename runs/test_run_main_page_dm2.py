@@ -7,6 +7,8 @@ from runs.pages.main_page_dm2 import MainPage as Page
 from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
 import time
 import random
+from pytest import mark
+import datetime
 
 logging = Logging()
 log = logging.logger
@@ -22,13 +24,14 @@ noone = Page(driver=browser)
 noone.go()
 
 
+@mark.usefixtures('driver_init_main_page')
 class RunMainPageDM2(object):
 
     def test_run(self):
 
         # Команды
 
-        log(test_start)
+        log(test_start + "Время: {}".format(str(datetime.datetime.now())))
 
         try:
             try:

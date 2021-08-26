@@ -276,3 +276,18 @@ class AuthProfilePage(BasePage):
         """
         return self.XPATH('//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]')
 
+    @property
+    def profile(self):
+        """
+        Иконка профиля
+        :return:
+        """
+        return self.XPATH('//li[@class="nav-item nav-item-profile"]')
+
+    @property
+    def log_out(self):
+        """
+        Кнопка выхода из личного кабинета
+        :return:
+        """
+        return self.XPATH('//ul[@class="nav-item-dropdown"]/li[5]')

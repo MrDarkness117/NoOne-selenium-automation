@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from runs.pages.footer_main_page import FooterMainPage as Page
 from runs.pages.base.logging_report import LogReport, Logging, TakeScreenshot
+import datetime
 import time
 
 logging = Logging()
@@ -24,7 +25,7 @@ class RunFooter(object):
     url = driver.current_url
 
     def test_run(self):
-        log(test_start)
+        log(test_start + "Время: {}".format(str(datetime.datetime.now())))
 
         try:
             self.noone.cookies.click()

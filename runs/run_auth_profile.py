@@ -3,6 +3,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from runs.pages.auth_profile_page import AuthProfilePage as Page
 from runs.pages.base.logging_report import LogReport, Logging, TakeScreenshot
+import datetime
 
 # log = '=' * 90 + "\n"
 # n = 0
@@ -21,7 +22,7 @@ from runs.pages.base.logging_report import LogReport, Logging, TakeScreenshot
 #         log += report + '\n'
 
 logging = Logging()
-log = logging.log
+log = logging.logger
 
 
 class RunAuthProfile(object):
@@ -42,10 +43,7 @@ class RunAuthProfile(object):
 
     def test_run(self):
 
-        if __name__ == '__main__':
-            log("=" * 5 + "Начало тестирования.")
-        else:
-            log("=" * 5 + "Начало тестирования {}".format(RunAuthProfile().__class__.__name__))
+        log(test_start + "Время: {}".format(str(datetime.datetime.now())))
 
         try:
             # Стандартные действия
@@ -62,6 +60,7 @@ class RunAuthProfile(object):
             self.section_recs()
             self.section_views()
             self.open_sections()
+            self.log_out()
         except Exception as e:
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
             TakeScreenshot(RunAuthProfile()).take_screenshot()
@@ -120,28 +119,37 @@ class RunAuthProfile(object):
             log('/' * 10 + "ОШИБКА: Один или более разделов не открывается!" + '\\' * 10)
 
     def section_favs(self):
-        self.noone.favourites.click()
-        self.section_tests()
-        self.action_hover(
-            '//div[@class="item js-item"][1]//li[@class="slider-item"][3]',
-            '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
-        )
+        try:
+            self.noone.favourites.click()
+            self.section_tests()
+            self.action_hover(
+                '//div[@class="item js-item"][1]//li[@class="slider-item"][3]',
+                '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
+            )
+        except Exception as e:
+            log('/' * 10 + "ОШИБКА: Раздел не работает! + \n{}".format(e) + '\\' * 10)
 
     def section_recs(self):
-        self.noone.recommendations.click()
-        self.section_tests()
-        self.action_hover(
-            '//div[@class="item js-item"][1]//img[contains(@class, "js-image-lazy")][3]',
-            '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
-        )
+        try:
+            self.noone.recommendations.click()
+            self.section_tests()
+            self.action_hover(
+                '//div[@class="item js-item"][1]//img[contains(@class, "js-image-lazy")][3]',
+                '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
+            )
+        except Exception as e:
+            log('/' * 10 + "ОШИБКА: Раздел не работает! + \n{}".format(e) + '\\' * 10)
 
     def section_views(self):
-        self.noone.viewed.click()
-        self.section_tests()
-        self.action_hover(
-            '//div[@class="item js-item"][1]//img[contains(@class, "js-image-lazy")][3]',
-            '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
-        )
+        try:
+            self.noone.viewed.click()
+            self.section_tests()
+            self.action_hover(
+                '//div[@class="item js-item"][1]//img[contains(@class, "js-image-lazy")][3]',
+                '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
+            )
+        except Exception as e:
+            log('/' * 10 + "ОШИБКА: Раздел не работает! \n{}".format(e) + '\\' * 10)
 
     # Команды для повторного использования
 
@@ -167,6 +175,16 @@ class RunAuthProfile(object):
             log('/' * 10 + "ОШИБКА: Ошибка работы элемента!" + '\\' * 10)
             print("Ошибка работы элемента!")
 
+    def log_out(self):
+        log("Выйти из личного кабинета")
+        self.noone.profile.hover_center()
+        self.noone.log_out.click()
+        log("=" * 5 + "Выход прошел успешно")
+
+
+test_start = "=" * 5 + "Начало тестирования {}.".format(RunAuthProfile().__class__.__name__)
+
 
 if __name__ == '__main__':
     RunAuthProfile().test_run()
+    test_start = "=" * 5 + "Начало тестирования"

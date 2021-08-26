@@ -1,9 +1,9 @@
+import datetime
 import random
 import time
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.wait import WebDriverWait
 from runs.pages.cart_page import CartPage as Page
 from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
 
@@ -29,7 +29,7 @@ class RunCart(object):
 
     def test_run(self):
 
-        log(test_start)
+        log(test_start + "Время: {}".format(str(datetime.datetime.now())))
 
         try:
             # Стандартные действия
@@ -108,6 +108,20 @@ class RunCart(object):
         self.noone.dy_product_window.click()
         log("Нажать на появишвуюся кнопку предварительного просмотра товара")
 
+    def item_color_block(self):
+        """
+        Всегда выбирает неактивный элемент. Если это невозможно, то выбирает первый элемет из списка.
+        :return:
+        """
+        log("Нажать на окно выбора цвета товара")
+        self.noone.item_color_block.click()
+        try:
+            log("Выбрать цвет с без класса .is-active")
+            self.noone.item_color_element.click()
+        except:
+            log("=" * 5 + "Не найдено более одного варианта, выбираю единственный возможный")
+            self.noone.item_color_element_single.click()
+
     def item_size_block_click(self):
         self.noone.item_size_block.click()
         log("Нажать на окно размеров")
@@ -185,7 +199,7 @@ class RunCart(object):
 
     def delivery_date_select_click(self):
         try:
-            self.noone.form_delivery_date_element()
+            self.noone.form_delivery_date_element().click()
             log("Выбрать дату доставки")
         except:
             log("/"*10 + "ВНИМАНИЕ: Выбрать дату невозможно" + '\\'*10)
@@ -222,7 +236,7 @@ class RunCart(object):
         self.noone.profile_my_orders.click()
         log("Открыть окно заказа")
         try:
-            for i in range(1, 60):
+            for i in range(1, 100):
                 self.noone.profile_my_orders_open_order.click()
                 log("Удалить заказ")
                 self.noone.order_delete.click()

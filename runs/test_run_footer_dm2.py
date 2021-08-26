@@ -1,13 +1,16 @@
+import datetime
+import time
+from pytest import mark
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from runs.pages.footer_main_page_dm2 import FooterMainPage as Page
 from runs.pages.base.logging_report import LogReport, Logging, TakeScreenshot
-import time
 
 logging = Logging()
 log = logging.logger
 
 
+@mark.usefixtures('driver_init_footer')
 class RunFooterDM2(object):
     # Настройки
 
@@ -23,11 +26,13 @@ class RunFooterDM2(object):
     noone.go()
     url = driver.current_url
 
+    @mark.testrun
     def test_run(self):
         if __name__ == '__main__':
             log("=" * 5 + "Начало тестирования.")
         else:
-            log("=" * 5 + "Начало тестирования {}".format(RunFooterDM2().__class__.__name__))
+            log("=" * 5 + "Начало тестирования {}".format(RunFooterDM2().__class__.__name__) +
+                "Время: {}".format(datetime.datetime.now()))
 
         try:
             self.noone.cookies.click()
@@ -37,7 +42,7 @@ class RunFooterDM2(object):
             TakeScreenshot(RunFooterDM2()).take_screenshot()
 
         log('='*5 + "Завершение тестирования.")
-        self.driver.quit()
+        # self.driver.quit()
         LogReport(logs=logging.log, testblock=RunFooterDM2()).test_results()
 
     def nav_links(self):

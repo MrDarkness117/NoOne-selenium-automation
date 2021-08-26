@@ -1,9 +1,11 @@
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+
 from selenium.webdriver.chrome.options import Options
 from runs.pages.catalog_page_dm2 import CatalogPage as Page
 from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
+from pytest import mark
+import datetime
 import random
 import time
 import re
@@ -12,6 +14,7 @@ logging = Logging()
 log = logging.logger
 
 
+@mark.usefixtures('driver_init_catalog')
 class RunCatalogDM2(object):
     # Настройки
 
@@ -27,9 +30,10 @@ class RunCatalogDM2(object):
     noone.go()
     url = driver.current_url
 
+    @mark.testrun
     def test_run(self):
 
-        log(test_start)
+        log(test_start + "Время: {}".format(str(datetime.datetime.now())))
 
         try:
             self.close_popups()

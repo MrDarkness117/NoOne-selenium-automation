@@ -187,6 +187,31 @@ class CartPage(CoreLocators):
         )
 
     @property
+    def item_color_block(self):
+        """
+        Блок выбора цвета товара
+        :return:
+        """
+        return self.XPATH('//div[@class="select item-color-list js-item-list"]//div[@class="select-value"]')
+
+    @property
+    def item_color_element(self):
+        """
+        Блок выбора цвета товара
+        :return:
+        """
+        return self.XPATH('//div[@class="select item-color-list js-item-list select-open"]//ul[@class="select-list"]/li[@class="select-item"][1]')
+
+    @property
+    def item_color_element_single(self):
+        """
+        Блок выбора цвета товара
+        :return:
+        """
+        return self.XPATH('//div[@class="select item-color-list js-item-list select-open"]//ul[@class="select-list"]/li[1]')
+
+
+    @property
     def item_size_block(self):
         """
         Выпадающий список обуви

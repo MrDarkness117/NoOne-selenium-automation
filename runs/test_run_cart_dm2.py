@@ -1,6 +1,7 @@
 import random
 import time
-
+import datetime
+from pytest import mark
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
@@ -11,6 +12,7 @@ logging = Logging()
 log = logging.logger
 
 
+@mark.usefixtures('driver_init_cart')
 class RunCartDM2(object):
 
     # Настройки
@@ -29,12 +31,15 @@ class RunCartDM2(object):
 
     def test_run(self):
 
-        log(test_start)
+        log(test_start + "Время: {}".format(str(datetime.datetime.now())))
 
         try:
             # Стандартные действия
-            self.noone.region_confirm.click()
-            self.noone.cookies.click()
+            try:
+                self.noone.region_confirm.click()
+                self.noone.cookies.click()
+            except Exception as e:
+                log("=" * 5 + "Ошибка покиска элементов: \n{}".format(e))
 
             # Действия Cart Page
             self.auth()
@@ -110,12 +115,28 @@ class RunCartDM2(object):
             self.noone.cart.click()
 
     def preview_click(self):
-        self.noone.dy_product_window.click()
         log("Нажать на появишвуюся кнопку предварительного просмотра товара")
+        self.noone.dy_product_window.click()
+
+    def item_color_block(self):
+        log("Нажать на окно выбора цвета товара")
+        self.noone.item_color_block.click()
+
+    def item_color_element(self):
+        """
+        Всегда выбирает неактивный элемент. Если это невозможно, то выбирает первый элемет из списка.
+        :return:
+        """
+        try:
+            log("Выбрать цвет с без класса .is-active")
+            self.noone.item_color_element.click()
+        except Exception as e:
+            log("=" * 5 + "Не найдено более одного варианта, выбираю единственный возможный")
+            self.noone.item_color_element_single.click()
 
     def item_size_block_click(self):
-        self.noone.item_size_block.click()
         log("Нажать на окно размеров")
+        self.noone.item_size_block.click()
 
     def item_size_click(self):
         random_size = random.randint(1, len(self.driver.find_elements_by_xpath(
@@ -127,30 +148,30 @@ class RunCartDM2(object):
         self.noone.item_size(random_size).click()
 
     def item_add_click(self):
-        self.noone.item_add.click()
         log("Нажать на 'добавить в корзину'")
+        self.noone.item_add.click()
 
     def accept_click(self):
-        self.noone.item_bootbox_accept.click()
         log("Нажать на 'Перейти в корзину'")
+        self.noone.item_bootbox_accept.click()
 
     def surname_enter(self):
         text = "Романцов"
-        self.noone.surname.input_text(text)
         log("Ввести фамилию ({})".format(text))
+        self.noone.surname.input_text(text)
 
     def city_select_click(self):
-        self.noone.city_select.click()
         log("Кнопка выбора города")
+        self.noone.city_select.click()
 
     def city_select_element_click(self):
         city = '1'  # г Москва
-        self.noone.city_select_element(city).click()
         log("Выбрать первый из выпадающего списка город (г Москва)")
+        self.noone.city_select_element(city).click()
 
     def form_check_deselect(self):
-        checkbox_test = self.driver.execute_script("document.querySelector('.form-check-input').checked")
         log("Отключить чек-бокс \"Запомнить адрес\". Автоматическая проверка состояния чекбокса:")
+        checkbox_test = self.driver.execute_script("document.querySelector('.form-check-input').checked")
         if str(checkbox_test) != 'false':
             self.noone.form_check_save.click()
             log('='*5 + "Чекбокс не был отключен.")
@@ -160,6 +181,7 @@ class RunCartDM2(object):
     def form_info(self):
         # if self.noone.form_info("Улица и дом").text != 'г Москва, ул Профсоюзная, д 37':
         #     self.driver.find_elements_by_xpath('//ul[@class="form-autocomplete-list"]/li[1]').click()
+        log("Заполнить информацию адреса доставки")
         self.noone.form_info("Квартира").input_text('43')
         self.noone.form_info("Подъезд").input_text('3')
         self.noone.form_info("Этаж").input_text('1')
@@ -174,11 +196,10 @@ class RunCartDM2(object):
         time.sleep(3)
         self.driver.find_element_by_xpath('//div[@class="form-group form-autocomplete"]'
                                           '//li[1]').click()
-        log("Заполнить информацию адреса доставки")
 
     def delivery_click(self):
-        self.noone.form_delivery.click()
         log("Выбрать метод доставки")
+        self.noone.form_delivery.click()
 
     def delivery_date_click(self):
         log("=" * 5 + "Выбираем дату доставки")
@@ -190,46 +211,46 @@ class RunCartDM2(object):
 
     def delivery_date_select_click(self):
         try:
-            self.noone.form_delivery_date_element()
             log("Выбрать дату доставки")
+            self.noone.form_delivery_date_element()
         except:
             log("/"*10 + "ВНИМАНИЕ: Выбрать дату невозможно" + '\\'*10)
 
     def payment_method_click(self):
-        self.noone.payment_method().click()
         log("Выбрать метод оплаты")
+        self.noone.payment_method().click()
 
     def order_comment_click(self):
-        self.noone.order_comment_activate().click()
         log("Нажать на область ввода комментария к доставке")
+        self.noone.order_comment_activate().click()
 
     def order_comment_text(self):
         comment = 'Это тестовый заказ от сотрудников NoOne. Он должен быть автоматически удалён. ' \
                   'В случае возникновения вопросов - звонить по номеру: +7 (916) 716-33-00'
+        log("Ввести комментарий к доставке: '{}'".format(comment))
         self.noone.order_comment_box().input_text(
             comment
         )
-        log("Ввести комментарий к доставке: '{}'".format(comment))
 
     # def promo(self):
     #     self.noone.promocode().input_text()
 
     def order_btn(self):
-        self.noone.order_btn().click()
         log("Нажать на кнопку оформления заказа.")
+        self.noone.order_btn().click()
 
     def cancel_order(self):
         log("="*5 + "Отмена заказа")
+        log("Перейти в раздел отмены заказа")
         self.noone.logo.click()
         self.noone.profile.hover_center()
-        log("Перейти в раздел отмены заказа")
         self.noone.profile_personal_info.click()
         self.noone.profile_my_orders.click()
-        log("Открыть окно заказа")
+        log("Открыть окно заказа, удалить Новые")
         try:
-            for i in range(1, 60):
+            for i in range(1, 10):
                 self.noone.profile_my_orders_open_order.click()
-                log("Удалить заказ")
+                log("=" * 5 + "Удалить заказ")
                 self.noone.order_delete.click()
                 log("="*5 + "Подтвердить удаление заказа")
                 self.noone.order_delete_confirm.click()
@@ -238,8 +259,7 @@ class RunCartDM2(object):
                 self.noone.go_back()
         except:
             log("="*5+"Заказов нет, либо все отменены.")
-
-    log('='*5 + "Проверка оформления заказа")
+        log("=" * 5 + "Игнорировать DM2, заказы удаляются только через администрирование")
 
 
 test_start = "=" * 5 + "Начало тестирования {}.".format(RunCartDM2().__class__.__name__)

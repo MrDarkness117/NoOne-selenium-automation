@@ -6,6 +6,7 @@ from runs.pages.main_page import MainPage
 from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
 import time
 import random
+import datetime
 
 logging = Logging()
 log = logging.logger
@@ -25,9 +26,11 @@ noone.go()
 
 class RunMainPage(object):
 
+    driver = browser
+
     def test_run(self):
 
-        log(test_start)
+        log(test_start + "Время: {}".format(str(datetime.datetime.now())))
 
         try:
             try:
@@ -62,6 +65,11 @@ class RunMainPage(object):
             except:
                 print("No ribbon appeared")"""
 
+            try:
+                log("Принять Cookies")
+                noone.cookies.click()
+            except:
+                log("=" * 5 + "No cookies requested")
             log("Нажать на кнопку окна продукта")
             noone.dy_product_window.click()
             log("Нажать на кнопку покупки")

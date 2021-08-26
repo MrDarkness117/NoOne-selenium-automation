@@ -1,5 +1,6 @@
 import random
-
+import datetime
+from pytest import mark
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 # from selenium.webdriver.support.wait import WebDriverWait
@@ -34,18 +35,19 @@ city_list = {
     "Санкт-Петербург": '78000000000',  # Санкт-Петербург
     "Казань": '16000001000',  # Казань
 }
-search_value = "мокасины"
+search_value = "зонт"
 
 noone = MainPage(driver=driver)
 noone.go()
 url = driver.current_url
 
 
+@mark.usefixtures('driver_init_header')
 class RunHeaderDM2(object):
 
     def test_run(self):
 
-        log(test_start)
+        log(test_start + "Время: {}".format(str(datetime.datetime.now())))
 
         # Стандартные команды
 
@@ -133,7 +135,7 @@ class RunHeaderDM2(object):
                 noone.category_select(1)
         except Exception as e:
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
-            TakeScreenshot(RunHeader()).take_screenshot()
+            TakeScreenshot(RunHeaderDM2()).take_screenshot()
 
         log("="*5 + "Завершение тестирования.")
         time.sleep(2)

@@ -3,27 +3,14 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from runs.pages.auth_profile_page_dm2 import AuthProfilePage as Page
 from runs.pages.base.logging_report import LogReport, Logging, TakeScreenshot
-
-# log = '=' * 90 + "\n"
-# n = 0
-#
-#
-# def log(report):
-#     global log
-#     global n
-#     if report[0] != '=':
-#         if report[0] != '/':
-#             n += 1
-#             log += str(n) + '. ' + report + "\n"
-#         else:
-#             log += report + '\n'
-#     else:
-#         log += report + '\n'
+from pytest import mark
+import datetime
 
 logging = Logging()
 log = logging.logger
 
 
+@mark.usefixtures('driver_init_profile')
 class RunAuthProfileDM2(object):
     # Настройки
 
@@ -40,9 +27,10 @@ class RunAuthProfileDM2(object):
     noone.go()
     url = driver.current_url
 
+    @mark.testrun
     def test_run(self):
 
-        log(test_start)
+        log(test_start + "Время: {}".format(str(datetime.datetime.now())))
         # Стандартные действия
         try:
             self.noone.cookies.click()
@@ -58,13 +46,14 @@ class RunAuthProfileDM2(object):
             # self.section_recs()  # отсутствуют товары
             # self.section_views()  # отсутствуют товары
             self.open_sections()
+            self.log_out()
         except Exception as e:
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
             TakeScreenshot(RunAuthProfileDM2()).take_screenshot()
 
         log('=' * 5 + "Завершение тестирования.")
         self.driver.quit()
-        LogReport(logs=log, testblock=RunAuthProfileDM2()).test_results()
+        LogReport(logs=logging.log, testblock=RunAuthProfileDM2()).test_results()
 
     # Команды
 
@@ -119,28 +108,38 @@ class RunAuthProfileDM2(object):
             log('/' * 10 + "ОШИБКА: Один или более разделов не открывается!" + '\\' * 10)
 
     def section_favs(self):
-        self.noone.favourites.click()
-        self.section_tests()
-        self.action_hover(
-            '//div[@class="item js-item"][1]//li[@class="slider-item"][3]',
-            '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
-        )
+        try:
+            self.noone.favourites.click()
+            self.section_tests()
+            self.action_hover(
+                '//div[@class="item js-item"][1]//li[@class="slider-item"][3]',
+                '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
+            )
+        except Exception as e:
+            log('/' * 10 + "ОШИБКА: Раздел не работает! + \n{}".format(e) + '\\' * 10)
 
     def section_recs(self):
-        self.noone.recommendations.click()
-        self.section_tests()
-        self.action_hover(
-            '//div[@class="item js-item"][1]//img[contains(@class, "js-image-lazy")][3]',
-            '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
-        )
+        try:
+            self.noone.recommendations.click()
+            self.section_tests()
+            self.action_hover(
+                '//div[@class="item js-item"][1]//img[contains(@class, "js-image-lazy")][3]',
+                '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
+            )
+        except Exception as e:
+            log('/' * 10 + "ОШИБКА: Раздел не работает! + \n{}".format(e) + '\\' * 10)
+
 
     def section_views(self):
-        self.noone.viewed.click()
-        self.section_tests()
-        self.action_hover(
-            '//div[@class="item js-item"][1]//img[contains(@class, "js-image-lazy")][3]',
-            '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
-        )
+        try:
+            self.noone.viewed.click()
+            self.section_tests()
+            self.action_hover(
+                '//div[@class="item js-item"][1]//img[contains(@class, "js-image-lazy")][3]',
+                '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
+            )
+        except Exception as e:
+            log('/' * 10 + "ОШИБКА: Раздел не работает! + \n{}".format(e) + '\\' * 10)
 
     # Команды для повторного использования
 
@@ -168,6 +167,12 @@ class RunAuthProfileDM2(object):
         else:
             log('/' * 10 + "ОШИБКА: Ошибка работы элемента!" + '\\' * 10)
             print("Ошибка работы элемента!")
+
+    def log_out(self):
+        log("Выйти из личного кабинета")
+        self.noone.profile.hover_center()
+        self.noone.log_out.click()
+        log("=" * 5 + "Выход прошел успешно")
 
 
 test_start = "=" * 5 + "Начало тестирования {}.".format(RunAuthProfileDM2().__class__.__name__)

@@ -1,3 +1,5 @@
+import datetime
+
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -32,7 +34,8 @@ class RunCatalog(object):
         if __name__ == '__main__':
             log("=" * 5 + "Начало тестирования.")
         else:
-            log("=" * 5 + "Начало тестирования {}.".format(RunCatalog().__class__.__name__))
+            log("=" * 5 + "Начало тестирования {}.".format(RunCatalog().__class__.__name__) +
+                "Время: {}".format(datetime.datetime.now()))
 
         try:
             self.close_popups()
@@ -235,7 +238,7 @@ def screenshot():
     TakeScreenshot(RunCatalog()).take_screenshot()
 
 
-test_start = "=" * 5 + "Начало тестирования {}.".format(RunFooter().__class__.__name__)
+test_start = "=" * 5 + "Начало тестирования {}.".format(RunCatalog().__class__.__name__)
 
 
 if __name__ == '__main__':
