@@ -241,6 +241,29 @@ class CartPage(CoreLocators):
         )
 
     @property
+    def item_size_single(self):
+        """
+        Выбрать размер обуви (случайное значение)
+        :return:
+        """
+        locator = Locator(
+            by=By.XPATH,
+            value='//li[@class="select-item item-size"]'
+        )
+        return BaseElement(
+            driver=self.driver,
+            locator=locator
+        )
+
+    @property
+    def image_selection(self):
+        """
+        Открыть предпросмотр другого изображения из списка
+        :return:
+        """
+        return self.XPATH('//div[@class="bootbox-body"]//ul[@class="item-thumb-list js-item-thumb-list"]/li[2]')
+
+    @property
     def item_add(self):
         """
         Добавить в корзиру

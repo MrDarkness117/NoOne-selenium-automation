@@ -43,8 +43,11 @@ class RunCatalog(object):
             self.catalog_view()
             self.select_filters()
             self.select_first_product()
+            self.next_page()
+            self.sort_test()
+            self.favs()
         except Exception as e:
-            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
             screenshot()
 
         log("=" * 5 + "Завершение тестирования.")
@@ -115,22 +118,22 @@ class RunCatalog(object):
                 random.randrange(1, len(self.driver.find_elements_by_xpath(
                     "//div[@id='block-BRAND']//li[@class='filter-item filter-item-default ']")), 1)
             ),
-            self.noone.filter_size(
-                random.randrange(1, len(self.driver.find_elements_by_xpath(
-                    "//div[@id='block-RAZMER']//li[@class='filter-item filter-item-default ']")), 1)
-            ),
-            self.noone.filter_color(
-                random.randrange(1, len(self.driver.find_elements_by_xpath(
-                    "//div[@id='block-COLOR_GROUP']//li[@class='filter-item filter-item-color ']")), 1)
-            ),
-            self.noone.filter_season(
-                random.randrange(1, len(self.driver.find_elements_by_xpath(
-                    "//div[@id='block-SEASONALITY']//li[@class='filter-item filter-item-default ']")), 1)
-            ),
-            self.noone.filter_collection(
-                random.randrange(1, len(self.driver.find_elements_by_xpath(
-                    "//div[@id='block-COLLECTION']//li[@class='filter-item filter-item-default ']")), 1)
-            ),
+            # self.noone.filter_size(
+            #     random.randrange(1, len(self.driver.find_elements_by_xpath(
+            #         "//div[@id='block-RAZMER']//li[@class='filter-item filter-item-default ']")), 1)
+            # ),
+            # self.noone.filter_color(
+            #     random.randrange(1, len(self.driver.find_elements_by_xpath(
+            #         "//div[@id='block-COLOR_GROUP']//li[@class='filter-item filter-item-color ']")), 1)
+            # ),
+            # self.noone.filter_season(
+            #     random.randrange(1, len(self.driver.find_elements_by_xpath(
+            #         "//div[@id='block-SEASONALITY']//li[@class='filter-item filter-item-default ']")), 1)
+            # ),
+            # self.noone.filter_collection(
+            #     random.randrange(1, len(self.driver.find_elements_by_xpath(
+            #         "//div[@id='block-COLLECTION']//li[@class='filter-item filter-item-default ']")), 1)
+            # ),
             # self.noone.filter_model(
             #     random.randrange(1, len(self.driver.find_elements_by_xpath(
             #         "//div[@id='block-MODEL']//li[@class='filter-item filter-item-default ']")), 1)
@@ -198,13 +201,25 @@ class RunCatalog(object):
         log("Проверить сортировку товаров")
         self.noone.sort_button.click()
         self.noone.sort_option_grow.click()
-        self._sort_compare('item-price', "span[@class='item-price-new text-data']")
+        try:
+            self._sort_compare('item-price', "span[@class='item-price-new text-data']")
+        except:
+            self.driver.refresh()
+            self._sort_compare('item-price', "span[@class='item-price-new text-data']")
         self.noone.sort_button.click()
         self.noone.sort_option_shrink.click()
-        self._sort_compare('item-price', "span[@class='item-price-new text-data']")
+        try:
+            self._sort_compare('item-price', "span[@class='item-price-new text-data']")
+        except:
+            self.driver.refresh()
+            self._sort_compare('item-price', "span[@class='item-price-new text-data']")
         self.noone.sort_button.click()
         self.noone.sort_option_discount.click()
-        self._sort_compare('item-label-list', "div[@class='item-label item-label-discount']")
+        try:
+            self._sort_compare('item-label-list', "div[@class='item-label item-label-discount']")
+        except:
+            self.driver.refresh()
+            self._sort_compare('item-label-list', "div[@class='item-label item-label-discount']")
 
     def favs(self):
         log("Проверить работу кнопки \"Добавить в избранное\"")

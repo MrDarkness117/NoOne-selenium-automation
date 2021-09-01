@@ -116,6 +116,21 @@ class MainPage(BasePage):
         )
 
     @property
+    def item_size_single(self):
+        """
+        Выбрать размер обуви (случайное значение)
+        :return:
+        """
+        locator = Locator(
+            by=By.XPATH,
+            value='//li[contains(@class, "item-size")]'
+        )
+        return BaseElement(
+            driver=self.driver,
+            locator=locator
+        )
+
+    @property
     def item_add(self):
         """
         Добавить в корзиру

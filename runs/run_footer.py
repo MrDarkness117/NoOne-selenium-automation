@@ -31,7 +31,7 @@ class RunFooter(object):
             self.noone.cookies.click()
             self.nav_links()
         except Exception as e:
-            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
             TakeScreenshot(RunFooter()).take_screenshot()
 
         log('='*5 + "Завершение тестирования.")
@@ -40,7 +40,7 @@ class RunFooter(object):
 
     def nav_links(self):
         # for i in self.driver.find_elements_by_xpath("//footer//a[@class='nav-item']"):
-        for i in range(1, 12, 1):
+        for i in range(1, len(self.driver.find_elements_by_xpath("//footer//li[@class='nav-item']")), 1):
             log("Перейти по ссылке элемента: " + str(i))
             self.driver.execute_script('window.scrollTo(0,document.body.scrollHeight)')
             # i.click()

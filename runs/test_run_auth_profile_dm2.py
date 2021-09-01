@@ -48,7 +48,7 @@ class RunAuthProfileDM2(object):
             self.open_sections()
             self.log_out()
         except Exception as e:
-            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
             TakeScreenshot(RunAuthProfileDM2()).take_screenshot()
 
         log('=' * 5 + "Завершение тестирования.")

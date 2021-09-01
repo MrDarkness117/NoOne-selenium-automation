@@ -105,36 +105,37 @@ class RunHeaderDM2(object):
             except:
                 log("/"*10 + "Ошибка перехода в корзину!" + "\\"*10)
             try:
-                noone.logo_basket.click()
+                log("Вернуться на главную страницу")
+                self.noone.logo_basket.click()
             except:
-                log("="*5 + "Пробую закрыть всплывающие окна")
-                driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')
-                noone.logo_basket.click()
+                log("=" * 5 + "Пробую закрыть всплывающие окна")
+                self.driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')
+                self.noone.logo_basket.click()
 
             try:
-                noone.gender_select(random.randint(1, len(driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li'))
-                                                   )).click()
-                noone.category_select(random.randint(1, len(driver.find_elements_by_tag_name('ul.nav-primary > li'))
-                                                     )).click()
+                log("Пробую перейти в каталог")
+                log("=" * 5 + "Выбираю раздел полов")
+                self.noone.gender_select(
+                    random.randint(1, len(self.driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li'))
+                                   )).click()
+                log("=" * 5 + "Выбираю раздел товаров")
+                self.noone.category_select(
+                    random.randint(1, len(self.driver.find_elements_by_xpath('//ul[@class="nav-primary"]/li'))
+                                   )).click()
             except:
-                log("="*5 + "Пробую закрыть всплывающие окна")
+                log("=" * 5 + "Пробую закрыть всплывающие окна")
+                self.driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')
+                log("=" * 5 + "Окно закрыто.")
 
-                try:
-                    driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')
-                except:
-                    log("=" * 5 + "Невозможно выполнить скрипт, пропускаю шаг")
-                log("="*5 + "Окно закрыто.")
-
-                # noone.gender_select(random.randint(1, len(driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li'))
-                #                                    )).click()
-                # time.sleep(1)
-                # noone.category_select(random.randint(1, len(driver.find_elements_by_tag_name('ul.nav-primary > li'))
-                #                                      )).click()
-                noone.gender_select(2)
+                self.noone.gender_select(
+                    random.randint(1, len(self.driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li'))
+                                   )).click()
                 time.sleep(1)
-                noone.category_select(1)
+                self.noone.category_select(
+                    random.randint(1, len(self.driver.find_elements_by_xpath('//ul[@class="nav-primary"]/li'))
+                                   )).click()
         except Exception as e:
-            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {0}".format(str(e)))
             TakeScreenshot(RunHeaderDM2()).take_screenshot()
 
         log("="*5 + "Завершение тестирования.")

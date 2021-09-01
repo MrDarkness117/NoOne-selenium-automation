@@ -100,15 +100,29 @@ class MainPage(BasePage):
             locator=locator
         )
 
-    @property
-    def item_size(self):
+    def item_size(self, num):
         """
         Выбрать размер обуви (случайное значение)
         :return:
         """
         locator = Locator(
             by=By.XPATH,
-            value='//li[contains(@class, "item-size")][{}]'.format(random.randint(1, 5))
+            value='//li[contains(@class, "item-size")][{}]'.format(random.randint(1, num))
+        )
+        return BaseElement(
+            driver=self.driver,
+            locator=locator
+        )
+
+    @property
+    def item_size_single(self):
+        """
+        Выбрать размер обуви (случайное значение)
+        :return:
+        """
+        locator = Locator(
+            by=By.XPATH,
+            value='//li[contains(@class, "item-size")]'
         )
         return BaseElement(
             driver=self.driver,

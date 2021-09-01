@@ -102,26 +102,31 @@ class CatalogPage(CoreLocators):
 
         return self.XPATH('//div[@id="catalog-view-toggle"]')
 
-    def filter_category(self, num):
+    # <Фильтры>
+
+    @property
+    def filter_category(self):
         """
         Фильтр категории
         :return:
         """
-        return self.XPATH("//div[@id='block-CATEGORY']//li[{}]".format(num))
+        return self.XPATH("//div[@id='block-CATEGORY']")
 
-    def filter_brand(self, num):
+    @property
+    def filter_brand(self):
         """
         Фильтр бренда (если доступен)
         :return:
         """
-        return self.XPATH("//div[@id='block-BRAND']//li[{}]".format(num))
+        return self.XPATH("//div[@id='block-BRAND']")
 
-    def filter_size(self, num):
+    @property
+    def filter_size(self):
         """
         Фильтр размера (если доступен)
         :return:
         """
-        return self.XPATH("//div[@id='block-RAZMER']//li[{}]".format(num))
+        return self.XPATH("//div[@id='block-RAZMER']")
 
     def filter_color(self, num):
         """
@@ -132,59 +137,67 @@ class CatalogPage(CoreLocators):
 
         return self.XPATH("//div[@id='block-COLOR_GROUP']//ul[@class='filter-list filter-list-colors']//li[{}]".format(num))
 
-    def filter_season(self, num):
+    @property
+    def filter_season(self):
         """
         Фильтр сезонов (если доступен)
         :param num:
         :return:
         """
 
-        return self.XPATH("//div[@id='block-SEASONALITY']//li[{}]".format(num))
+        return self.XPATH("//div[@id='block-SEASONALITY']")
 
-    def filter_collection(self, num):
+    @property
+    def filter_collection(self):
         """
         Фильтр коллекции (если доступен)
         :param num:
         :return:
         """
 
-        return self.XPATH("//div[@id='block-COLLECTION']//li[{}]".format(num))
+        return self.XPATH("//div[@id='block-COLLECTION']")
 
-    def filter_model(self, num):
+    @property
+    def filter_model(self):
         """
         Фильтр моделей (если доступен)
         :param num:
         :return:
         """
 
-        return self.XPATH("//div[@id='block-MODEL']//li[{}]".format(num))
+        return self.XPATH("//div[@id='block-MODEL']")
 
-    def filter_basic_material(self, num):
+    @property
+    def filter_basic_material(self):
         """
         Фильтр базового материала (если доступен)
         :param num:
         :return:
         """
 
-        return self.XPATH("//div[@id='block-BASIC_MATERIAL']//li[{}]".format(num))
+        return self.XPATH("//div[@id='block-BASIC_MATERIAL']")
 
-    def filter_lining_material(self, num):
+    @property
+    def filter_lining_material(self):
         """
         Фильтр материала подкладки (если доступен)
         :param num:
         :return:
         """
 
-        return self.XPATH("//div[@id='block-LINING_MATERIAL']//li[{}]".format(num))
+        return self.XPATH("//div[@id='block-LINING_MATERIAL']")
 
-    def filter_group(self, num):
+    @property
+    def filter_group(self):
         """
         Фильтр группы (если доступен)
         :param num:
         :return:
         """
 
-        return self.XPATH("//div[@id='block-GROUP_REF']//li[{}]".format(num))
+        return self.XPATH("//div[@id='block-GROUP_REF']")
+
+    # </Фильтры>
 
     @property
     def catalog_item(self):

@@ -74,13 +74,6 @@ class RunHeader(object):
                     try:
                         log("="*5 + "Пробую закрыть всплывающие окна")
                         self.driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')
-
-                        # driver.switch_to.frame(driver.find_elements_by_css_selector("iframe[id='fl-513145']"))
-                        # print("Переключен на iframe")
-                        # driver.find_elements_by_xpath('//div[@class="widget__close js-collapse-login"]').click()
-                        # print("iframe закрыт")
-                        # driver.switch_to.default_content()
-
                         self.noone.city_menu.click()
                         log("="*5 + "Пробую код: {}".format(code))
                         self.noone.city_selector(code=code).click()
@@ -89,12 +82,14 @@ class RunHeader(object):
                     except:
                         log("/"*10 + "Критическая ошибка." + "\\"*10)
 
-                # try:
-                #     WebDriverWait(driver, 4).until(lambda driver: driver.current_url != url)
-                # except:
-                #     print("Ошибка загрузки страницы!")
-
             log("="*5 + "Проверка городов завершена!")
+            log("Проверить скроллинг и закрепление шапки сайта (.header -> .header.header-fixed)")
+            self.driver.execute_script('window.scrollTo(0, 400);')
+            if self.driver.find_element_by_tag_name('header').get_attribute('class') == 'header header-fixed':
+                log("="*5 + "Скроллинг работает правильно, шапка сайта закрепилась!")
+            else:
+                log("/"*10 + "Ошибка работы скроллинга!" + "\\"*10)
+            self.driver.execute_script('window.scrollTo(0, -400);')
             try:
                 log("Перейти на страницу авторизации")
                 self.noone.auth_link.click()
@@ -102,7 +97,6 @@ class RunHeader(object):
                 log("/"*10 + "Ошибка перехода на страницу авторизации!" + "\\"*10)
             log("Проверить загрузку страницы по логотипу")
             self.noone.logo.click()
-            # WebDriverWait(driver, 15).until(lambda driver: driver.current_url == "https://noone.ru")
             log("Проверить поле ввода текста")
             self.noone.search_input.input_text(self.search_value)
             log("="*5 + "Поиск по '{}'".format(self.search_value))
@@ -118,6 +112,7 @@ class RunHeader(object):
             except:
                 log("/"*10 + "Ошибка перехода в корзину!" + "\\"*10)
             try:
+                log("Вернуться на главную страницу")
                 self.noone.logo_basket.click()
             except:
                 log("="*5 + "Пробую закрыть всплывающие окна")
@@ -125,9 +120,12 @@ class RunHeader(object):
                 self.noone.logo_basket.click()
 
             try:
+                log("Пробую перейти в каталог")
+                log("="*5 + "Выбираю раздел полов")
                 self.noone.gender_select(random.randint(1, len(self.driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li'))
                                                    )).click()
-                self.noone.category_select(random.randint(1, len(self.driver.find_elements_by_tag_name('ul.nav-primary > li'))
+                log("="*5 + "Выбираю раздел товаров")
+                self.noone.category_select(random.randint(1, len(self.driver.find_elements_by_xpath('//ul[@class="nav-primary"]/li'))
                                                      )).click()
             except:
                 log("="*5 + "Пробую закрыть всплывающие окна")
@@ -137,10 +135,10 @@ class RunHeader(object):
                 self.noone.gender_select(random.randint(1, len(self.driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li'))
                                                    )).click()
                 time.sleep(1)
-                self.noone.category_select(random.randint(1, len(self.driver.find_elements_by_tag_name('ul.nav-primary > li'))
+                self.noone.category_select(random.randint(1, len(self.driver.find_elements_by_xpath('//ul[@class="nav-primary"]/li'))
                                                      )).click()
         except Exception as e:
-            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {0}".format(str(e)))
             TakeScreenshot(RunHeader()).take_screenshot()
 
         log("="*5 + "Завершение тестирования.")

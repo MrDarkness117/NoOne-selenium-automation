@@ -1,10 +1,11 @@
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from runs.pages.catalog_page_dm2 import CatalogPage as Page
 from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
-from pytest import mark
+# from pytest import mark
 import datetime
 import random
 import time
@@ -14,7 +15,7 @@ logging = Logging()
 log = logging.logger
 
 
-@mark.usefixtures('driver_init_catalog')
+# @mark.usefixtures('driver_init_catalog')
 class RunCatalogDM2(object):
     # Настройки
 
@@ -30,7 +31,7 @@ class RunCatalogDM2(object):
     noone.go()
     url = driver.current_url
 
-    @mark.testrun
+    # @mark.testrun
     def test_run(self):
 
         log(test_start + "Время: {}".format(str(datetime.datetime.now())))
@@ -44,7 +45,7 @@ class RunCatalogDM2(object):
             self.next_page()
             self.sort_test()
         except Exception as e:
-            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
             screenshot()
 
         log("=" * 5 + "Завершение тестирования.")
@@ -112,19 +113,33 @@ class RunCatalogDM2(object):
                 except:
                     log("=" * 5 + "Все фильтры раскрыты")
         log("Выбрать произвольные фильтры")
-        filters = [
-            self.noone.filter_category(
-                random.randrange(1, len(self.driver.find_elements_by_xpath(
-                    "//div[@id='block-CATEGORY']//li[@class='filter-item filter-item-default']")), 1)
-            ),
-            self.noone.filter_brand(
-                random.randrange(1, len(self.driver.find_elements_by_xpath(
-                    "//div[@id='block-BRAND']//li[@class='filter-item filter-item-default']")), 1)
-            ),
-            self.noone.filter_color(
+
+        category = self.driver.find_element_by_xpath("//div[@id='block-CATEGORY']")
+        brand = self.driver.find_element_by_xpath("//div[@id='block-BRAND']")
+        try:
+            category_elem = category.find_element_by_xpath(".//li[@class='filter-item filter-item-default'][{}]"
+                                       .format(random.randrange(1, len(self.driver.find_elements_by_xpath(
+            "//div[@id='block-CATEGORY']//li[@class='filter-item filter-item-default']")), 1)))
+        except:
+            category_elem = category.find_element_by_xpath(".//li[@class='filter-item filter-item-default']")
+        try:
+            brand_elem = brand.find_element_by_xpath(".//li[@class='filter-item filter-item-default'][{}]".format(
+                random.randrange(1, len(brand.find_elements_by_xpath('.//li[@class="filter-item filter-item-default"]')))
+            ))
+        except:
+            brand_elem = brand.find_element_by_xpath(".//li[@class='filter-item filter-item-default']")
+        try:
+            color = self.noone.filter_color(
                 random.randrange(1, len(self.driver.find_elements_by_xpath(
                     "//div[@id='block-COLOR_GROUP']//li[@class='filter-item filter-item-color']")), 1)
-            ),
+            )
+        except:
+            color = self.noone.filter_color(1)
+
+        filters = [
+            category_elem,
+            brand_elem,
+            color
             # self.noone.filter_model(
             #     random.randrange(1, len(self.driver.find_elements_by_xpath(
             #         "//div[@id='block-MODEL']//li[@class='filter-item filter-item-default ']")), 1)
@@ -148,7 +163,6 @@ class RunCatalogDM2(object):
                 log("=" * 5 + "Тестирую {}".format(el))
                 el.click()
                 time.sleep(1)
-                # WebDriverWait(self.driver, 10).until(EC.url_changes)
             except:
                 log("/" * 10 + "ОШИБКА: Один из фильтров не был найден ({})! См. по ссылке".format(el) + "\\" * 10)
                 screenshot()
@@ -226,7 +240,7 @@ class RunCatalogDM2(object):
             compare.append(int(re.sub('[^0-9]', '', element.text)))
             n += 1
         print(compare)
-        return log("="*5 + 'Первый товар > последний: {}'.format(compare[0] > compare[-1]))
+        return log("=" * 5 + 'Первый товар > последний: {}'.format(compare[0] > compare[-1]))
 
 
 def screenshot():
@@ -235,8 +249,6 @@ def screenshot():
 
 test_start = "=" * 5 + "Начало тестирования {}.".format(RunCatalogDM2().__class__.__name__)
 
-
 if __name__ == '__main__':
     RunCatalogDM2().test_run()
     test_start = "=" * 5 + "Начало тестирования."
-

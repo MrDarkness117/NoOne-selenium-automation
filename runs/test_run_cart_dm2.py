@@ -66,7 +66,7 @@ class RunCartDM2(object):
             self.order_btn()
             self.cancel_order()
         except Exception as e:
-            log("/"*10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\"*10 + "\nОшибка: {}".format(e))
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
             TakeScreenshot(RunCartDM2()).take_screenshot()
 
         log("="*5 + "Завершение тестирования.")
@@ -139,13 +139,17 @@ class RunCartDM2(object):
         self.noone.item_size_block.click()
 
     def item_size_click(self):
-        random_size = random.randint(1, len(self.driver.find_elements_by_xpath(
-            '//div[@class="select item-size-list js-item-size-list select-open"]'
-            '//ul[@class="select-list"]'
-            '//li[@class="select-item item-size"]'
-        )))
-        log("Выбрать случайный размер - size-id: {}".format(random_size))
-        self.noone.item_size(random_size).click()
+        try:
+            random_size = random.randint(1, len(self.driver.find_elements_by_xpath(
+                '//div[@class="select item-size-list js-item-size-list select-open"]'
+                '//ul[@class="select-list"]'
+                '//li[@class="select-item item-size"]'
+            )))
+            log("Выбрать случайный размер - size-id: {}".format(random_size))
+            self.noone.item_size(random_size).click()
+        except:
+            log("=" * 5 + "Доступен только один размер, выбираю")
+            self.noone.item_size_single.click()
 
     def item_add_click(self):
         log("Нажать на 'добавить в корзину'")

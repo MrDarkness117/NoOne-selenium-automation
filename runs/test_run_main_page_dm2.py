@@ -72,8 +72,13 @@ class RunMainPageDM2(object):
             # log("Нажать на кнопку покупки")
             # noone.item_buy.click()
             # log("Выбрать размер продукта")
-            # noone.item_size.click()
-            # log("Добавить продукт в корзину")
+            # try:
+            #     noone.item_size(len(self.driver.find_elements_by_xpath('//ul[@id="size-list"]//li[contains(@class, "item-size")]'))).click()
+            # except:
+            #     try:
+            #         noone.item_size_single.click()
+            #     except:
+            #         log("="*5 + "Нет доступных размеров")
             # noone.item_add.click()
             # log("Нажать на кнопку 'Приинять'")
             # noone.item_bootbox_accept.click()
@@ -98,7 +103,7 @@ class RunMainPageDM2(object):
             noone.journal.click()
             time.sleep(2)
         except Exception as e:
-            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
             TakeScreenshot(RunMainPageDM2()).take_screenshot()
 
         log("=" * 5 + "Завершение тестирования.")

@@ -75,7 +75,13 @@ class RunMainPage(object):
             log("Нажать на кнопку покупки")
             noone.item_buy.click()
             log("Выбрать размер продукта")
-            noone.item_size.click()
+            try:
+                noone.item_size(len(self.driver.find_elements_by_xpath('//ul[@id="size-list"]//li[contains(@class, "item-size")]'))).click()
+            except:
+                try:
+                    noone.item_size_single.click()
+                except:
+                    log("="*5 + "Нет доступных размеров")
             log("Добавить продукт в корзину")
             noone.item_add.click()
             log("Нажать на кнопку 'Приинять'")
@@ -97,13 +103,13 @@ class RunMainPage(object):
             noone.journal.click()
             time.sleep(2)
         except Exception as e:
-            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
             TakeScreenshot(RunMainPage()).take_screenshot()
 
         log("=" * 5 + "Успех, завершение теста")
         browser.quit()
 
-        LogReport(testblock=RunMainPage(), logs=logging.log)
+        LogReport(testblock=RunMainPage(), logs=logging.log).test_results()
 
 
 test_start = "=" * 5 + "Начало тестирования {}.".format(RunMainPage().__class__.__name__)

@@ -62,12 +62,12 @@ class RunAuthProfile(object):
             self.open_sections()
             self.log_out()
         except Exception as e:
-            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
             TakeScreenshot(RunAuthProfile()).take_screenshot()
 
         log('=' * 5 + "Завершение тестирования.")
         self.driver.quit()
-        LogReport(logs=log, testblock=RunAuthProfile()).test_results()
+        LogReport(logs=logging.log, testblock=RunAuthProfile()).test_results()
 
     # Команды
 
@@ -115,8 +115,9 @@ class RunAuthProfile(object):
             self.noone.preferred_shop.click()
             self.noone.feedback.click()
             log('=' * 5 + "Все разделы успешно открываются")
-        except:
+        except Exception as e:
             log('/' * 10 + "ОШИБКА: Один или более разделов не открывается!" + '\\' * 10)
+            print(e)
 
     def section_favs(self):
         try:
@@ -127,7 +128,8 @@ class RunAuthProfile(object):
                 '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
             )
         except Exception as e:
-            log('/' * 10 + "ОШИБКА: Раздел не работает! + \n{}".format(e) + '\\' * 10)
+            log('/' * 10 + "ОШИБКА: Раздел не работает!" + "\n{0}".format(str(e)) + '\\' * 10)
+            print(e)
 
     def section_recs(self):
         try:
@@ -138,7 +140,8 @@ class RunAuthProfile(object):
                 '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
             )
         except Exception as e:
-            log('/' * 10 + "ОШИБКА: Раздел не работает! + \n{}".format(e) + '\\' * 10)
+            log('/' * 10 + "ОШИБКА: Раздел не работает!" + "\n{0}".format(str(e)) + '\\' * 10)
+            print(e)
 
     def section_views(self):
         try:
@@ -149,7 +152,8 @@ class RunAuthProfile(object):
                 '//ul[@class="item-image-nav"][1]//li[@class="item-image-nav-link"][3]'
             )
         except Exception as e:
-            log('/' * 10 + "ОШИБКА: Раздел не работает! \n{}".format(e) + '\\' * 10)
+            log('/' * 10 + "ОШИБКА: Раздел не работает!" + "\n{0}".format(str(e)) + '\\' * 10)
+            print(e)
 
     # Команды для повторного использования
 
