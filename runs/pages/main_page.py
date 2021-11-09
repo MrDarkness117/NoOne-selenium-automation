@@ -1,11 +1,11 @@
 from .base.locator import Locator
-from .base.base_page import BasePage
 from .base.base_element import BaseElement
 from selenium.webdriver.common.by import By
+from ._core import CoreLocators
 import random
 
 
-class MainPage(BasePage):
+class MainPage(CoreLocators):
 
     url = "https://noone.ru/"
 
@@ -100,19 +100,13 @@ class MainPage(BasePage):
             locator=locator
         )
 
-    def item_size(self, num):
-        """
-        Выбрать размер обуви (случайное значение)
-        :return:
-        """
-        locator = Locator(
-            by=By.XPATH,
-            value='//li[contains(@class, "item-size")][{}]'.format(random.randint(1, num))
-        )
-        return BaseElement(
-            driver=self.driver,
-            locator=locator
-        )
+    @property
+    def modal_ok(self):
+        return self.XPATH('//button[contains(text(), "OK")]')
+
+    @property
+    def item_size(self):
+        return self.XPATH('//div[@class="bootbox modal modal-item-view in"]//ul[@class="item-size-list"]/li[1]')
 
     @property
     def item_size_single(self):
@@ -129,20 +123,21 @@ class MainPage(BasePage):
             locator=locator
         )
 
-    @property
-    def item_add(self):
-        """
-        Добавить в корзиру
-        :return:
-        """
-        locator = Locator(
-            by=By.ID,
-            value='add-to-cart'
-        )
-        return BaseElement(
-            driver=self.driver,
-            locator=locator
-        )
+    # TODO: OBSOLETE
+    # @property
+    # def item_add(self):
+    #     """
+    #     Добавить в корзиру
+    #     :return:
+    #     """
+    #     locator = Locator(
+    #         by=By.ID,
+    #         value='add-to-cart'
+    #     )
+    #     return BaseElement(
+    #         driver=self.driver,
+    #         locator=locator
+    #     )
 
     @property
     def item_bootbox_accept(self):

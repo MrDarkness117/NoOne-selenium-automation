@@ -3,6 +3,8 @@ import random
 import time
 
 from selenium import webdriver
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from runs.pages.cart_page import CartPage as Page
 from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
@@ -33,7 +35,9 @@ class RunCart(object):
 
         try:
             # Стандартные действия
+            # time.sleep(2)
             self.noone.region_confirm.click()
+            time.sleep(1)
             self.noone.cookies.click()
 
             # Действия Cart Page
@@ -43,25 +47,49 @@ class RunCart(object):
             self.cart_click()
             self.product_recommended_hover()
             self.preview_click()
-            self.item_size_block_click()
-            self.item_size_click()
-            self.item_add_click()
-            self.accept_click()
+            try:
+                self.item_size_block_click()
+                self.item_size_click()
+                self.item_add_click()
+                self.accept_click()
+            except Exception as e:
+                log("/"*10 + "ОШИБКА: Не найдены блоки предпросмотра в корзине!" + "\\"*10 + str(e))
+                log('='*5 + "Обход ошибки - оформить заказ через каталог")
+                self.add_from_catalog()
             self.surname_enter()
             self.city_select_click()
             self.city_select_element_click()
-            self.form_check_deselect()
-            self.form_info()
+            try:
+                # self.driver.find_element_by_xpath('//div[contains(@class, "text-title-3") and contains(text(), "Пункт самовывоза")]//span[contains(text(), "Выбрать другой")]')
+                # self.noone.form_address_change.click()
+                self.noone.form_address_select.click()
+                self.noone.select_all.click()
+                time.sleep(0.5)
+                self.noone.select_all.click()
+            except:
+                self.form_info()
+                self.form_check_deselect()
+                try:
+                    log("="*5 + "Проверка зависания")
+                    self.driver.find_element_by_xpath("//ul[@class='form-autocomplete-list']")
+                    log('/'*10 + "Список адресов завис!!" + "\\"*10)
+                except:
+                    log("="*5 + "Зависания не произошло")
+                self.noone.select_all.click()
+                time.sleep(0.5)
+                self.noone.select_all.click()
             self.delivery_click()
             self.delivery_date_click()
             self.delivery_date_select_click()
+            time.sleep(1)
             self.payment_method_click()
             self.order_comment_click()
             self.order_comment_text()
             self.order_btn()
             self.cancel_order()
         except Exception as e:
-            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            print(e)
             TakeScreenshot(RunCart()).take_screenshot()
 
         log("="*5 + "Завершение тестирования.")
@@ -78,7 +106,7 @@ class RunCart(object):
     def auth_fields(self):
         auth_info = {
             'login': 'm.romantsov@noone.ru',
-            'password': 'mihailo'
+            'password': 'Mihailo117'
         }
         self.noone.auth_field_login.input_text(auth_info['login'])
         self.noone.auth_field_pass.input_text(auth_info['password'])
@@ -86,7 +114,7 @@ class RunCart(object):
         log("Ввести логин/пароль, нажать 'войти'")
 
     def logo(self):
-        self.noone.logo.click()
+        self.noone.header_logo.click()
         log("Перейти по логотипу на главную страницу")
 
     def cart_click(self):
@@ -155,6 +183,23 @@ class RunCart(object):
         log("Нажать на 'Перейти в корзину'")
         self.noone.item_bootbox_accept.click()
 
+    def add_from_catalog(self):
+        self.noone.close_modal_preview.click()
+        log("="*5 + "Перехожу на страницу каталога")
+        log("Перейти на страницу каталога")
+        self.noone.logo.click()
+        self.noone.catalog_male.click()
+        self.noone.catalog_male_shoes.click()
+        self.noone.catalog_first_item.hover_center()
+        log("Открыть окно превью первого товара")
+        self.noone.catalog_preview_btn.click()
+        log("Выбрать размер обуви")
+        self.noone.catalog_preview_size_select.click()
+        log("Нажать \"Добавить в корзину\"")
+        self.noone.catalog_preview_add_to_cart.click()
+        log("Перейти в корзину через кнопку появившегося модального окна")
+        self.noone.catalog_preview_go_to_cart.click()
+
     def surname_enter(self):
         text = "Романцов"
         log("Ввести фамилию ({})".format(text))
@@ -165,7 +210,7 @@ class RunCart(object):
         self.noone.city_select.click()
 
     def city_select_element_click(self):
-        city = '1'  # г Москва
+        city = 1  # г Москва
         log("Выбрать первый из выпадающего списка город (г Москва)")
         self.noone.city_select_element(city).click()
 
@@ -242,7 +287,7 @@ class RunCart(object):
 
     def cancel_order(self):
         log("="*5 + "Отмена заказа")
-        self.noone.logo.click()
+        self.noone.header_logo.click()
         self.noone.profile.hover_center()
         log("Перейти в раздел отмены заказа")
         self.noone.profile_personal_info.click()

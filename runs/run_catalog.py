@@ -38,13 +38,21 @@ class RunCatalog(object):
                 "Время: {}".format(datetime.datetime.now()))
 
         try:
+            print('close popups')
             self.close_popups()
+            print('open category')
             self.open_category()
+            print('catalog view')
             self.catalog_view()
+            print('select filters')
             self.select_filters()
+            print('select first product')
             self.select_first_product()
+            print('go to next page')
             self.next_page()
+            print('sort test')
             self.sort_test()
+            print('favs')
             self.favs()
         except Exception as e:
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
@@ -57,10 +65,12 @@ class RunCatalog(object):
     def close_popups(self):
         log("=" * 5 + "Закрываю всплывающие окна")
         self.noone.region_confirm.click()
+        time.sleep(1)
         self.noone.cookies.click()
 
     def open_category(self):
         log("Перейти в произвольный раздел каталога.")
+        self.driver.execute_script('window.scrollBy(0, -1000)')
         self.noone.gender_select_random(
             random.randrange(1, len(self.driver.find_elements_by_xpath('//ul[@class="nav-gender"]//li')))).click()
         self.noone.category_select_random(
@@ -70,6 +80,7 @@ class RunCatalog(object):
     def catalog_view(self):
         log("Проверить работу сортировки каталога.")
         self.noone.button_grid_mode.click()
+        WebDriverWait(self.driver, 10).until(EC.url_contains('catalog'))
         try:
             test = self.driver.find_element_by_id('catalog-items')
             test_class = test.get_attribute('class')
@@ -100,8 +111,8 @@ class RunCatalog(object):
             try:
                 i.click()
                 log("=" * 5 + "Фильтр раскрыт")
-            except:
-                log("=" * 5 + "Проблема с поиском закрытых фильтров, пробую открыть ещё раз")
+            except Exception as e:
+                log("=" * 5 + "Проблема с поиском закрытых фильтров, пробую открыть ещё раз. \n{}".format(str(e)))
                 self.driver.execute_script('window.scrollBy(0,100)')
                 try:
                     i.click()

@@ -104,7 +104,7 @@ class CartPage(CoreLocators):
         )
 
     @property
-    def logo(self):
+    def header_logo(self):
         """
                 Логотип страницы
                 :return:
@@ -117,6 +117,10 @@ class CartPage(CoreLocators):
             driver=self.driver,
             locator=locator
         )
+
+    @property
+    def logo(self):
+        return self.XPATH('//a[@class="logo"]')
 
     @property
     def cart(self):
@@ -326,7 +330,7 @@ class CartPage(CoreLocators):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//div[contains(text(), "Способ получения")]//span[contains(@class, "form-select-dropdown")]'
+            value='//div[contains(text(), "Способ получения")]//span[contains(@class, "form-select-dropdown")]/span'
         )
         return BaseElement(
             driver=self.driver,
@@ -362,6 +366,31 @@ class CartPage(CoreLocators):
             driver=self.driver,
             locator=locator
         )
+
+    @property
+    def form_address_change(self):
+        """
+        Кнопка "Выбрать другой" адрес
+        :return:
+        """
+        return self.XPATH('//div[contains(@class, "text-title-3") and contains(text(), "Пункт самовывоза")]'
+                          '//span[contains(text(), "Выбрать другой")]')
+
+    @property
+    def form_address_select(self):
+        """
+        Кнопка выбора адреса из предложенного ниже
+        :return:
+        """
+        return self.XPATH('//div[contains(text(), "Адрес доставки")]/../div[@class="form-card-list"]/label[1]')
+
+    @property
+    def select_all(self):
+        """
+        Флажок для выбора всех товаров на странице
+        :return:
+        """
+        return self.XPATH('//span[contains(text(), "Выбрать все")]')
 
     def form_info(self, info):
         """
@@ -624,4 +653,35 @@ class CartPage(CoreLocators):
             locator=locator
         )
 
+    @property
+    def close_modal_preview(self):
+        return self.XPATH('//button[@class="bootbox-close-button close"]')
 
+    @property
+    def catalog_male(self):
+        return self.XPATH('//span[@data-gender-target="M"]')
+
+    @property
+    def catalog_male_shoes(self):
+        return self.XPATH('//ul[@class="nav-primary"]/li/a[@class="nav-link js-link-to-level2"'
+                          ' and contains(text(), "Обувь")]')
+
+    @property
+    def catalog_first_item(self):
+        return self.XPATH('//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][1]')
+
+    @property
+    def catalog_preview_btn(self):
+        return self.XPATH('//div[@class="btn-item-view js-item-view"]')
+
+    @property
+    def catalog_preview_size_select(self):
+        return self.XPATH('//div[@class="bootbox modal modal-item-view in"]//ul[@class="item-size-list"]/li[1]')
+
+    @property
+    def catalog_preview_add_to_cart(self):
+        return self.XPATH('//a[contains(text(), "Добавить в корзину")]')
+
+    @property
+    def catalog_preview_go_to_cart(self):
+        return self.XPATH('//button[@class="btn btn-primary bootbox-accept"]')
