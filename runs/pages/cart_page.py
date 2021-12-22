@@ -45,7 +45,7 @@ class CartPage(CoreLocators):
     @property
     def auth_page(self):
         """
-        Автормзация необходима для дальнейших тестов
+        Автормиация необходима для дальнейших тестов
         :return:
         """
         #
@@ -59,6 +59,10 @@ class CartPage(CoreLocators):
         )
 
     @property
+    def auth_email_login(self):
+        return self.XPATH('//a[@href="#modal-auth-email"]')
+
+    @property
     def auth_field_login(self):
         """
         Логин
@@ -66,7 +70,7 @@ class CartPage(CoreLocators):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//fieldset[@class="form-fields"]//input[@name="USER_LOGIN"]'
+            value='//input[@name="USER_LOGIN"]'
         )
         return BaseElement(
             driver=self.driver,
@@ -81,7 +85,7 @@ class CartPage(CoreLocators):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//fieldset[@class="form-fields"]//input[@name="USER_PASSWORD"]'
+            value='//input[@name="USER_PASSWORD"]'
         )
         return BaseElement(
             driver=self.driver,
@@ -373,8 +377,7 @@ class CartPage(CoreLocators):
         Кнопка "Выбрать другой" адрес
         :return:
         """
-        return self.XPATH('//div[contains(@class, "text-title-3") and contains(text(), "Пункт самовывоза")]'
-                          '//span[contains(text(), "Выбрать другой")]')
+        return self.XPATH('//div[contains(text(), "Адрес доставки")]//span[contains(text(), "Выбрать другой")]')
 
     @property
     def form_address_select(self):
@@ -382,7 +385,23 @@ class CartPage(CoreLocators):
         Кнопка выбора адреса из предложенного ниже
         :return:
         """
-        return self.XPATH('//div[contains(text(), "Адрес доставки")]/../div[@class="form-card-list"]/label[1]')
+        return self.XPATH('//div[contains(@class, "text-title-3")]/../div[@class="form-card-list"]/label')
+
+    @property
+    def form_address_label_text(self):
+        """
+        Адрес указанный в чекбоксе
+        :return:
+        """
+        return self.XPATH('//div[contains(text(), "Адрес доставки")]/..'
+                          '/div[@class="form-card-list"]/label[2]//span[@class="form-check-label"]')
+
+    def form_address_show_all(self):
+        """
+        Кнопка "показать все" в адресах
+        :return:
+        """
+        return self.XPATH('//div[contains(text(), "Адрес доставки")]/..//span[contains(text(), "Показать все")]')
 
     @property
     def select_all(self):
@@ -406,6 +425,13 @@ class CartPage(CoreLocators):
             driver=self.driver,
             locator=locator
         )
+
+    def form_continue(self):
+        """
+        Кнопка "Продолжить"
+        :return:
+        """
+        return self.XPATH('//div[@class="modal-footer"]/div[contains(text(), "Продолжить")]')
 
     @property
     def form_delivery(self):
@@ -531,7 +557,8 @@ class CartPage(CoreLocators):
             locator=locator
         )
 
-    def item_delete(self, num):
+    @property
+    def item_delete(self):
         """
         Удалить предмет из корзины
         :return:
@@ -539,7 +566,7 @@ class CartPage(CoreLocators):
         # btn btn-action btn-delete js-item-delete
         locator = Locator(
             by=By.XPATH,
-            value='//button[contains(@class, "btn btn-action btn-delete js-item-delete")][{}]'.format(num)
+            value='//span[@id="remove-all-avaliable"]'
         )
         return BaseElement(
             driver=self.driver,
@@ -667,6 +694,11 @@ class CartPage(CoreLocators):
                           ' and contains(text(), "Обувь")]')
 
     @property
+    def catalog_male_bags(self):
+        return self.XPATH('//ul[@class="nav-primary"]/li/a[@class="nav-link js-link-to-level2"'
+                          ' and contains(text(), "Сумки")]')
+
+    @property
     def catalog_first_item(self):
         return self.XPATH('//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][1]')
 
@@ -679,9 +711,65 @@ class CartPage(CoreLocators):
         return self.XPATH('//div[@class="bootbox modal modal-item-view in"]//ul[@class="item-size-list"]/li[1]')
 
     @property
+    def catalog_preview_reserve(self):
+        return self.XPATH('//span[contains(text(), "Наличие и резерв")]')
+
+    @property
+    def catalog_preview_reserve_boutique(self):
+        return self.XPATH('//ul[@id="offer-shop-list"]/div[1]')
+
+    @property
+    def catalog_preview_reserve_reserve(self):
+        return self.XPATH('//div[@class="btn btn-block btn-primary js-reserve-link"]')
+
+    @property
+    def catalog_preview_reserve_close(self):
+        return self.XPATH('//div[@id="modal-offers"]//button[@class="close"]')
+
+    @property
     def catalog_preview_add_to_cart(self):
         return self.XPATH('//a[contains(text(), "Добавить в корзину")]')
 
     @property
     def catalog_preview_go_to_cart(self):
         return self.XPATH('//button[@class="btn btn-primary bootbox-accept"]')
+
+    @property
+    def search_field(self):
+        """
+        Строка поиска по каталогу
+        :return:
+        """
+        return self.XPATH('//input[@id="search-input"]')
+
+    @property
+    def first_item(self):
+        """
+        Первый и единственный товар для данной реализации
+        :return:
+        """
+        return self.XPATH('//div[@class="digi-products-grid digi-products-grid_horde"]/div')
+
+    @property
+    def search_submit(self):
+        """
+        Кнопка запроса поиска
+        :return:
+        """
+        return self.XPATH('//span[@id="search-form"]//button')
+
+    @property
+    def item_page_sizes(self):
+        return self.XPATH('//div[@class="item-info"]/ul[@class="item-size-list"]')
+
+    @property
+    def item_page_size(self):
+        return self.XPATH('//div[@class="item-info"]/ul[@class="item-size-list"]/li[1]')
+
+    @property
+    def item_page_color_list(self):
+        return self.XPATH('//div[@class="item-info"]/ul[@class="item-color-list"]')
+
+    @property
+    def item_page_color_option(self):
+        return self.XPATH('//div[@class="item-info"]/ul[@class="item-color-list/li[1]"]')
