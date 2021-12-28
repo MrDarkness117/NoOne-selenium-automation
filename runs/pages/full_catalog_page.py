@@ -58,7 +58,7 @@ class FullCatalog(CoreLocators):
 
     @property
     def auth_field_button(self):
-        return self.XPATH('//button[@name="Login"]')
+        return self.XPATH('//button[contains(text(), "Войти в аккаунт")]')
 
     @property
     def header_logo(self):
