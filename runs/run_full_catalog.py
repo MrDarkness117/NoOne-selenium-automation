@@ -72,22 +72,48 @@ class RunFullCatalog(object):
         self.driver.quit()
         LogReport(testblock=RunFullCatalog(), logs=logging.log).test_results()
 
+    def auth(self):
+        self.noone.auth_page.click()
+        log("Открыть окно авторизации")
+        self.noone.auth_email_login.click()
+        log("Перейти на вход по email")
+
+    def auth_fields(self):
+        auth_info = {
+            'login': 'm.romantsov@noone.ru',
+            'password': 'Mihailo117'
+        }
+        self.noone.auth_field_login.input_text(auth_info['login'])
+        self.noone.auth_field_pass.input_text(auth_info['password'])
+        self.noone.auth_field_button.click()
+        log("Ввести логин/пароль, нажать 'войти'")
+
+    def logo(self):
+        self.noone.header_logo.click()
+        log("Перейти по логотипу на главную страницу")
+
     def run_catalog_shoes_f(self):
+        self.driver.get(self.shoes_f_url)
         pass
 
     def run_catalog_bags_f(self):
+        self.driver.get(self.bags_f_url)
         pass
 
     def run_catalog_accessories_f(self):
+        self.driver.get(self.accessories_f_url)
         pass
 
     def run_catalog_shoes_m(self):
+        self.driver.get(self.shoes_m_url)
         pass
 
     def run_catalog_bags_m(self):
+        self.driver.get(self.bags_m_url)
         pass
 
     def run_catalog_accessories_m(self):
+        self.driver.get(self.accessories_m_url)
         pass
 
     def scan(self, params=1):
@@ -107,18 +133,35 @@ class RunFullCatalog(object):
         except:
             self.go_to_page_exception()
 
-    def scan_bags(self):
-        # //article[@id='item_details']//li[@class='item-size'] ? must not be clickable
-        # //div[@class='item-checkout']/a ? must always be clickable
-        pass
+    def scan_unsized(self):
+        try:
+            # WebDriverWait(self.driver, 1).until(EC.invisibility_of_element_located((
+            #     By.XPATH, '//div[@class="bootbox modal modal-item-view in"]//ul[@class="item-size-list"]/li[1]')))
+            self.noone.catalog_preview_add_to_cart.find()
+        except:
+            self.go_to_page_exception()
 
     def scan_simple(self):
+        try:
+            WebDriverWait(self.driver, 1).until(EC.invisibility_of_element_located((
+                By.XPATH, '//div[@class="bootbox modal modal-item-view in"]//ul[@class="item-size-list"]/li[1]')))
+            self.noone.catalog_preview_add_to_cart.find()
+        except:
+            self.go_to_page_exception(params=2)
         pass
 
-    def go_to_page_exception(self):
+    def go_to_page_exception(self, params=1):
         self.noone.catalog_preview_go_to_item.click()
-        log("/" * 5 + "Ошибка! Отсутствует размер у товара: " + "{} ".format(self.driver.current_url) + "\\" * 5)
-        self.noone.go_back()
+        if params == 1:
+            log("/" * 5 + "Ошибка! Отсутствует размер у товара: " + "{} ".format(self.driver.current_url) + "\\" * 5)
+            self.noone.go_back()
+        if params == 2:
+            log("/" * 5 + "Ошибка с товаром: " + "{} ".format(self.driver.current_url) + "\\" * 5)
+            self.noone.go_back()
+        if params == 3:
+            item_list = []
+
+            log("="*10 + "Размеры: {}".format(str(item_list)))
 
     def preview_items_on_page(self):
         for el in range(1, len(self.driver.find_elements_by_xpath(
@@ -127,10 +170,9 @@ class RunFullCatalog(object):
             self.noone.catalog_preview_btn.click()
 
 
-
-test_start = "=" * 5 + "Начало тестирования {}.".format(RunCart().__class__.__name__)
+test_start = "=" * 5 + "Начало тестирования {}.".format(RunFullCatalog().__class__.__name__)
 
 
 if __name__ == '__main__':
-    RunCart().test_run()
+    RunFullCatalog().test_run()
     test_start = "=" * 5 + "Начало тестирования."

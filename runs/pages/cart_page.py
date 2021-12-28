@@ -100,7 +100,8 @@ class CartPage(CoreLocators):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//button[@name="Login"]'
+            # value='//button[@name="Login"]'
+            value='//button[contains(text(), "Войти в аккаунт")]'
         )
         return BaseElement(
             driver=self.driver,
