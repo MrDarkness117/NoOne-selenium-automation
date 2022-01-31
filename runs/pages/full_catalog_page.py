@@ -79,6 +79,9 @@ class FullCatalog(CoreLocators):
     def catalog_nth_item(self, num):
         return self.XPATH('//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][{}]'.format(num))
 
+    def catalog_nth_item_sizes(self, num):
+        return self.XPATH('//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][{}]'.format(num))
+
     @property
     def catalog_preview_btn(self):
         return self.XPATH('//div[@class="btn-item-view js-item-view"]')

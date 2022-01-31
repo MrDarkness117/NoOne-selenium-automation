@@ -39,9 +39,12 @@ class RunFullCatalog(object):
     bags_m_url = 'https://www.noone.ru/catalog/muzhskoe/sumki/'
     accessories_m_url = 'https://www.noone.ru/catalog/muzhskoe/aksessuary/'
 
+    product_url = 'https://www.noone.ru/product/'
+
     def test_run(self):
 
         log(test_start + " Время: {}".format(str(datetime.datetime.now())))
+        sizes_list_catalog = {}
 
         try:
             # Стандартные действия
@@ -55,12 +58,12 @@ class RunFullCatalog(object):
             self.auth_fields()
             WebDriverWait(self.driver, 10).until(EC.invisibility_of_element((By.XPATH, '//a[@id="modal-auth-phone"]')))
 
-            self.run_catalog_shoes_f()
-            self.run_catalog_bags_f()
-            self.run_catalog_accessories_f()
-            self.run_catalog_shoes_m()
-            self.run_catalog_bags_m()
-            self.run_catalog_accessories_m()
+            sizes_list_catalog['female'].append(self.run_catalog_shoes_f())
+            # self.run_catalog_bags_f()
+            # self.run_catalog_accessories_f()
+            sizes_list_catalog['male'].append(self.run_catalog_shoes_m())
+            # self.run_catalog_bags_m()
+            # self.run_catalog_accessories_m()
 
         except Exception as e:
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
@@ -92,31 +95,45 @@ class RunFullCatalog(object):
         self.noone.header_logo.click()
         log("Перейти по логотипу на главную страницу")
 
+    def run_catalog_sizes(self):
+        sizes_catalog = {}
+        items = self.driver.find_elements_by_xpath('//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"]')
+        for item in items:
+            item_id = item.get_attribute('href').replace('/', '').replace('product', '')
+            for size_info in item.find_elements_by_xpath('//ul[@class="item-sizes"]'):
+                for size in size_info:
+                    sizes_catalog[item_id].append(size.get_attribute('data-text'))
+        return sizes_catalog
+
+    def run_item_page(self, item_id):
+        self.driver.get(item_id)
+
     def run_catalog_shoes_f(self):
         self.driver.get(self.shoes_f_url)
-        pass
+        return self.run_catalog_sizes()
 
-    def run_catalog_bags_f(self):
-        self.driver.get(self.bags_f_url)
-        pass
-
-    def run_catalog_accessories_f(self):
-        self.driver.get(self.accessories_f_url)
-        pass
+    # def run_catalog_bags_f(self):
+    #     self.driver.get(self.bags_f_url)
+    #     pass
+    #
+    # def run_catalog_accessories_f(self):
+    #     self.driver.get(self.accessories_f_url)
+    #     pass
 
     def run_catalog_shoes_m(self):
         self.driver.get(self.shoes_m_url)
-        pass
+        return self.run_catalog_sizes()
 
-    def run_catalog_bags_m(self):
-        self.driver.get(self.bags_m_url)
-        pass
+    # def run_catalog_bags_m(self):
+    #     self.driver.get(self.bags_m_url)
+    #     pass
+    #
+    # def run_catalog_accessories_m(self):
+    #     self.driver.get(self.accessories_m_url)
+    #     pass
 
-    def run_catalog_accessories_m(self):
-        self.driver.get(self.accessories_m_url)
-        pass
-
-    def scan(self, params=1):
+    @staticmethod
+    def scan(params=1):
         if params == 1:
             pass
         if params == 2:
