@@ -6,6 +6,10 @@ from selenium.webdriver.common.by import By
 
 class CoreLocators(BasePage):
 
+    def __init__(self, driver, url='https://noone.ru'):
+        super().__init__(driver)
+        self.url = url
+
     def ID(self, value):
         """
         ID wrapper

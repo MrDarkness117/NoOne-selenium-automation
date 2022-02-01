@@ -78,7 +78,7 @@ class RunAuthProfile(object):
     def auth_fields(self):
         auth_info = {
             'login': 'm.romantsov@noone.ru',
-            'password': 'mihailo'
+            'password': 'Mihailo117'
         }
         log("Ввести логин/пароль, нажать 'войти'")
         self.noone.auth_field_login.input_text(auth_info['login'])
@@ -117,7 +117,7 @@ class RunAuthProfile(object):
             log('=' * 5 + "Все разделы успешно открываются")
         except Exception as e:
             log('/' * 10 + "ОШИБКА: Один или более разделов не открывается!" + '\\' * 10)
-            print(e)
+            print(str(e))
 
     def section_favs(self):
         try:
@@ -129,7 +129,7 @@ class RunAuthProfile(object):
             )
         except Exception as e:
             log('/' * 10 + "ОШИБКА: Раздел не работает!" + "\n{0}".format(str(e)) + '\\' * 10)
-            print(e)
+            print(str(e))
 
     def section_recs(self):
         try:
@@ -141,7 +141,7 @@ class RunAuthProfile(object):
             )
         except Exception as e:
             log('/' * 10 + "ОШИБКА: Раздел не работает!" + "\n{0}".format(str(e)) + '\\' * 10)
-            print(e)
+            print(str(e))
 
     def section_views(self):
         try:
@@ -153,7 +153,7 @@ class RunAuthProfile(object):
             )
         except Exception as e:
             log('/' * 10 + "ОШИБКА: Раздел не работает!" + "\n{0}".format(str(e)) + '\\' * 10)
-            print(e)
+            print(str(e))
 
     # Команды для повторного использования
 

@@ -49,49 +49,33 @@ class RunMainPage(object):
             noone.dy_product_card.hover_center()
             browser.execute_script("window.scrollBy(0, 80)")
 
-            """try:
-                print("looking for ribbon...")
-                WebDriverWait(browser, 10).until(
-                    EC.frame_to_be_available_and_switch_to_it(browser.find_element_by_xpath("//iframe[@id='fl-450213']"))
-                )
-                # ribbon = browser.find_element(value='fl-450213')
-                # browser.switch_to.frame(ribbon)
-                print("iframe found")
-                # print(ribbon)
-                # noone.footer_ribbon.click()
-                browser.find_element_by_id('Ribbon-close').click()
-                print("closed iframe")
-                browser.switch_to.default_content()
-            except:
-                print("No ribbon appeared")"""
-
             try:
                 log("Принять Cookies")
                 noone.cookies.click()
             except:
                 log("=" * 5 + "No cookies requested")
-            log("Нажать на кнопку окна продукта")
+            log("Нажать на кнопку быстрого просмотра продукта")
             noone.dy_product_window.click()
             log("Нажать на кнопку покупки")
             noone.item_buy.click()
+            log("Получить уведомление, нажать ОК")
+            noone.modal_ok.click()
             log("Выбрать размер продукта")
-            try:
-                noone.item_size(len(self.driver.find_elements_by_xpath('//ul[@id="size-list"]//li[contains(@class, "item-size")]'))).click()
-            except:
-                try:
-                    noone.item_size_single.click()
-                except:
-                    log("="*5 + "Нет доступных размеров")
+            # try:
+            #     noone.item_size(len(self.driver.find_elements_by_xpath('//ul[@id="size-list"]//li[contains(@class, "item-size")]'))).click()
+            # except:
+            #     try:
+            #         noone.item_size_single.click()
+            #     except:
+            #         log("="*5 + "Нет доступных размеров")
+            noone.item_size.click()
             log("Добавить продукт в корзину")
-            noone.item_add.click()
-            log("Нажать на кнопку 'Приинять'")
+            noone.item_buy.click()
+            log("Нажать на кнопку 'Принять'")
             noone.item_bootbox_accept.click()
             # noone.item_bootbox_close.click()
             log("Перейти на страницу товара, дождаться загрузки")
-            noone.item_info_page.click()
-            WebDriverWait(browser, 10).until(lambda browser: browser.current_url != url)
-            log("Вернуться на одну страницу назад")
-            noone.go_back()  # после загрузки страницы товара
+            noone.go_back()
             time.sleep(random.randint(0, 10))
             log("Нажать на промо-баннер, дождаться загрузки")
             time.sleep(1)
@@ -106,7 +90,7 @@ class RunMainPage(object):
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
             TakeScreenshot(RunMainPage()).take_screenshot()
 
-        log("=" * 5 + "Успех, завершение теста")
+        log("=" * 5 + "Завершение тестирования.")
         browser.quit()
 
         LogReport(testblock=RunMainPage(), logs=logging.log).test_results()

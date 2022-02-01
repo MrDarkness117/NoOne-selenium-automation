@@ -1,8 +1,13 @@
 import datetime
 import random
 import time
+import json
 
 from selenium import webdriver
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
 from runs.pages.cart_page import CartPage as Page
 from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
@@ -26,6 +31,7 @@ class RunCart(object):
     noone = Page(driver=driver)
     noone.go()
     url = driver.current_url
+    skipCollection = False
 
     def test_run(self):
 
@@ -33,35 +39,89 @@ class RunCart(object):
 
         try:
             # Стандартные действия
+            # time.sleep(2)
             self.noone.region_confirm.click()
+            time.sleep(1)
             self.noone.cookies.click()
 
             # Действия Cart Page
             self.auth()
             self.auth_fields()
-            self.logo()
+            WebDriverWait(self.driver, 10).until(EC.invisibility_of_element((By.XPATH, '//a[@id="modal-auth-phone"]')))
             self.cart_click()
-            self.product_recommended_hover()
-            self.preview_click()
-            self.item_size_block_click()
-            self.item_size_click()
-            self.item_add_click()
-            self.accept_click()
+
+            # OLD
+
+            if not self.skipCollection:
+                self.product_recommended_hover()
+                self.preview_click()
+                try:
+                    self.item_size_block_click()
+                    self.item_size_click()
+                    self.item_add_click()
+                    # self.accept_click()
+                except Exception as e:
+                    log("/"*10 + "ОШИБКА: Не найдены блоки предпросмотра в корзине!" + "\\"*10 + str(e))
+                    try:
+                        log('='*5 + "Закрываю модальное окно")
+                        self.noone.close_modal_preview.click()
+                    except:
+                        log('/'*10 + "Отсутствует модальное окно" + '\\'*10)
+
+                with open('ids.json') as i:
+                    data = json.load(i)
+
+                if len(data) > 0:
+                    for d in data:
+                        self.search_item(str(d))
+                        self.item_page()
+                        self.noone.cart.click()
+                elif len(data) == 0:
+                    self.add_shoes_from_catalog()
+                    self.add_bags_from_catalog()
+
             self.surname_enter()
+            self.check_limits()
             self.city_select_click()
             self.city_select_element_click()
-            self.form_check_deselect()
-            self.form_info()
+            try:
+                # self.driver.find_element_by_xpath('//div[contains(@class, "text-title-3") and contains(text(), "Пункт самовывоза")]//span[contains(text(), "Выбрать другой")]')
+                # self.noone.form_address_change.click()
+                self.noone.form_address_select.click()
+                self.noone.select_all.click()
+                time.sleep(0.5)
+                self.noone.select_all.click()
+            except:
+                log("/"*10 + "ВНИМАНИЕ: Невозможно выбрать адрес из истории!" + "\\"*10)
+                self.noone.form_address_change.click()  # TODO: Внедрить проверку "Выбрать другой"
+                self.form_info()
+                self.form_check_deselect()
+                log("Нажать \"Продолжить\"")
+                self.noone.form_continue().click()
+                self.noone.form_address_show_all().click()
+                if self.noone.form_address_label_text.text == "Россия, Москва, ул Профсоюзная, 37, кв 43":  # FIXME:   В строке отображается без "Россия" и "кв 43", а также вместо "37" - "д 37"
+                    log("="*5 + "Адреса соответствуют")
+                # try:
+                #     log("="*5 + "Проверка зависания")
+                #     self.driver.find_element_by_xpath("//ul[@class='form-autocomplete-list']")
+                #     log('/'*10 + "Список адресов завис!!" + "\\"*10)
+                # except:
+                #     log("="*5 + "Зависания не произошло")
+                self.noone.select_all.click()
+                time.sleep(0.5)
+                self.noone.select_all.click()
             self.delivery_click()
             self.delivery_date_click()
             self.delivery_date_select_click()
+            time.sleep(1)
             self.payment_method_click()
             self.order_comment_click()
             self.order_comment_text()
             self.order_btn()
             self.cancel_order()
         except Exception as e:
-            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
+            log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
+            print(e)
             TakeScreenshot(RunCart()).take_screenshot()
 
         log("="*5 + "Завершение тестирования.")
@@ -74,11 +134,13 @@ class RunCart(object):
     def auth(self):
         self.noone.auth_page.click()
         log("Открыть окно авторизации")
+        self.noone.auth_email_login.click()
+        log("Перейти на вход по email")
 
     def auth_fields(self):
         auth_info = {
             'login': 'm.romantsov@noone.ru',
-            'password': 'mihailo'
+            'password': 'Mihailo117'
         }
         self.noone.auth_field_login.input_text(auth_info['login'])
         self.noone.auth_field_pass.input_text(auth_info['password'])
@@ -86,7 +148,7 @@ class RunCart(object):
         log("Ввести логин/пароль, нажать 'войти'")
 
     def logo(self):
-        self.noone.logo.click()
+        self.noone.header_logo.click()
         log("Перейти по логотипу на главную страницу")
 
     def cart_click(self):
@@ -99,7 +161,7 @@ class RunCart(object):
             log("Навести мышкой на товар снизу из списка")
         except:
             log('='*5 + "(?) Корзина уже не пустая. Удаляем товары.")
-            self.noone.item_delete(1).click()
+            self.noone.item_delete.click()
             # self.cart_click()
             log("Навести мышкой на товар снизу из списка")
             self.noone.dy_product_card.hover_center()
@@ -155,17 +217,143 @@ class RunCart(object):
         log("Нажать на 'Перейти в корзину'")
         self.noone.item_bootbox_accept.click()
 
+    def search_item(self, n):
+        log("Поиск товара по запросу: " + str(n))
+        self.noone.search_field.click()
+        self.noone.search_field.input_text(str(n))
+        self.noone.search_submit.click()
+
+        self.noone.first_item.click()
+
+    def item_page(self):
+        try:
+            log("=" * 5 + "Проверка выбора размера (обуви/одежды)")
+            self.noone.item_page_size.click()
+        except Exception as e:
+            log("/" * 10 + "У товара нет размеров" + "\\" * 10)
+
+        try:
+            log("=" * 5 + "Проверка наличия выбора вариантов цвета")
+            self.noone.item_page_color_list.find()
+            self.noone.item_page_color_option.find()
+        except:
+            log("/" * 10 + "У товара нет выбора вариантов цвета" + "\\" * 10)
+
+        try:
+            log("="*5 + "Проверка наличия резервирования, открыть окно")
+            self.noone.catalog_preview_reserve.click()
+            try:
+                log("Открыть выбрать первый доступный бутик")
+                self.noone.catalog_preview_reserve_boutique.click()
+                self.noone.catalog_preview_reserve_reserve.find()
+                log("Проверить доступность кнопки \"Зарезервировать\"")
+                self.noone.catalog_preview_reserve_close.click()
+            except:
+                log('/' * 10 + "ОШИБКА РАБОТЫ РЕЗЕРВИРОВАНИЯ!" + "\\" * 10)
+                self.noone.catalog_preview_reserve_close.click()
+        except:
+            log("/" * 10 + "У товара нет вариантов резервирования" + "\\" * 10)
+
+        try:
+            log("Нажать \"Добавить в корзину\"")
+            self.noone.catalog_preview_add_to_cart.click()
+            log("Перейти в корзину через кнопку появившегося модального окна")
+            self.noone.catalog_preview_go_to_cart.click()
+        except:
+            log("/"*10 + "ОШИБКА ДОБАВЛЕНИЯ ТОВАРА В КОРЗИНУ!" + "\\"*10)
+
+    def add_shoes_from_catalog(self):
+        log("="*5 + "Перехожу на страницу каталога")
+        log("Перейти на страницу каталога")
+        self.noone.logo.click()
+        # self.noone.catalog_male.click()
+        # WebDriverWait(self.driver, 10).until(EC.url_changes)
+        self.noone.catalog_male_shoes.click()
+        self.noone.catalog_first_item.hover_center()
+        log("Открыть окно превью первого товара")
+        self.noone.catalog_preview_btn.click()
+        try:
+            log("Выбрать размер обуви")
+            self.noone.catalog_preview_size_select.click()
+        except:
+            log('='*5 + "Не могу добавить размер - вероятно их для этого товара нет")
+        log("="*5 + "Проверить резервирование")
+        try:
+            log("Открыть окно резервирования")
+            self.noone.catalog_preview_reserve.click()
+            log("Открыть выбрать первый доступный бутик")
+            self.noone.catalog_preview_reserve_boutique.click()
+            log("Проверить доступность кнопки \"Зарезервировать\"")
+            try:
+                self.noone.catalog_preview_reserve_reserve.find()
+            except:
+                log('/'*10 + "CRITICAL: Ошибка функционала резервирования!!!")
+            log("Закрыть окно резервирования")
+            self.noone.catalog_preview_reserve_close.click()
+        except:
+            log("/"*10 + "Нет кнопки зарезервировать! " + str(self.driver.current_url) + '\\'*10)
+        log("Нажать \"Добавить в корзину\"")
+        self.noone.catalog_preview_add_to_cart.click()
+        log("Перейти в корзину через кнопку появившегося модального окна")
+        self.noone.catalog_preview_go_to_cart.click()
+
+    def add_bags_from_catalog(self):
+        log("="*5 + "Перехожу на страницу каталога")
+        log("Перейти на страницу каталога")
+        self.noone.logo.click()
+        self.noone.catalog_male.click()
+        time.sleep(0.5)
+        self.noone.catalog_male_bags.click()
+        self.noone.catalog_first_item.hover_center()
+        log("Открыть окно превью первого товара")
+        self.noone.catalog_preview_btn.click()
+        log("="*5 + "Проверить резервирование")
+        try:
+            log("Открыть окно резервирования")
+            self.noone.catalog_preview_reserve.click()
+            log("Открыть выбрать первый доступный бутик")
+            self.noone.catalog_preview_reserve_boutique.click()
+            log("Проверить доступность кнопки \"Зарезервировать\"")
+            try:
+                self.noone.catalog_preview_reserve_reserve.find()
+            except:
+                log('/'*10 + "CRITICAL: Ошибка функционала резервирования!!!")
+            log("Закрыть окно резервирования")
+            self.noone.catalog_preview_reserve_close.click()
+        except:
+            log("/"*10 + "Нет кнопки зарезервировать! " + str(self.driver.current_url) + '\\'*10)
+        log("Нажать \"Добавить в корзину\"")
+        self.driver.find_element_by_xpath('//span[contains(text(), "Добавить в корзину")]').click()
+        log("Перейти в корзину через кнопку появившегося модального окна")
+        try:
+            self.noone.catalog_preview_go_to_cart.click()
+        except:
+            log("="*5 + "Не нашел нужную кнопку, пробую другую")
+            self.driver.find_element_by_xpath('//div[@class="item-checkout"]').click()
+
     def surname_enter(self):
         text = "Романцов"
         log("Ввести фамилию ({})".format(text))
         self.noone.surname.input_text(text)
+
+    def check_limits(self):
+        log("Проверить уведомления на ограничения по размеру")
+        try:
+            self.driver.find_element_by_xpath('//div[contains(text(), "Превышено количество товаров")]')
+            log("="*5 + "Уведомление найдено, снимаю галочку на втором товаре")
+            WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, '//div[@id="tab-available"]//div[@id="cart-items-avaliable"]/div[2]/label')))
+            self.driver.find_element_by_xpath('//div[@id="tab-available"]//div[@id="cart-items-avaliable"]/div[2]/label').click()
+            log("="*5 + "Галочка снята")
+            time.sleep(1)
+        except:
+            log("Уведомление отсутствует")
 
     def city_select_click(self):
         log("Кнопка выбора города")
         self.noone.city_select.click()
 
     def city_select_element_click(self):
-        city = '1'  # г Москва
+        city = 1  # г Москва
         log("Выбрать первый из выпадающего списка город (г Москва)")
         self.noone.city_select_element(city).click()
 
@@ -192,8 +380,8 @@ class RunCart(object):
         time.sleep(1)
         self.noone.form_info("Улица и дом").input_text('ул Профсоюзная, ')
         time.sleep(1)
-        # self.noone.form_info("Улица и дом").input_text('д 37')  # TODO: Баг!!! http://proj.noone.ru/issues/124838
-        self.noone.form_info("Улица и дом").input_text('д 3')
+        self.noone.form_info("Улица и дом").input_text('д 37')  # TODO: Баг!!! http://proj.noone.ru/issues/124838
+        # self.noone.form_info("Улица и дом").input_text('д 3')
         time.sleep(3)
         self.driver.find_element_by_xpath('//div[@class="form-group form-autocomplete"]'
                                           '//li[1]').click()
@@ -242,6 +430,8 @@ class RunCart(object):
 
     def cancel_order(self):
         log("="*5 + "Отмена заказа")
+        self.noone.go_refresh()
+        # self.noone.header_logo.click()
         self.noone.logo.click()
         self.noone.profile.hover_center()
         log("Перейти в раздел отмены заказа")
@@ -270,9 +460,3 @@ test_start = "=" * 5 + "Начало тестирования {}.".format(RunCar
 if __name__ == '__main__':
     RunCart().test_run()
     test_start = "=" * 5 + "Начало тестирования."
-
-    # try:
-    #     RunCart().test_run()
-    # except:
-    #     print("Пробую закрыть всплывающие окна")
-    #     RunCart().driver.execute_script('document.querySelector(".flocktory-widget-overlay").click()')
