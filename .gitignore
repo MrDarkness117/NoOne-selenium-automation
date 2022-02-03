@@ -9,6 +9,3 @@ venv*
 *.png
 /runs/run_dm2.bat
 */.pytest_cache/
-.idea*
-*.iml
-.idea/misc.xml
