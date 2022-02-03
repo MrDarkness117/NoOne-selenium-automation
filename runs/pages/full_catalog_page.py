@@ -117,3 +117,11 @@ class FullCatalog(CoreLocators):
     @property
     def catalog_preview_go_to_item(self):
         return self.XPATH('//article[@id="item-details"]//a[@class="text-link"]')
+
+    @property
+    def last_page(self):
+        return self.XPATH('//ul[@class="pagination-list"]/li[last()]/a')
+
+    @property
+    def next_page(self):
+        return self.XPATH('//ul[@class="pagination-list"]//a[contains(text(), "Вперед")]')

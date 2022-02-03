@@ -2,7 +2,9 @@ import datetime
 import random
 import time
 import json
+import re
 
+from os import path
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -41,6 +43,10 @@ class RunFullCatalog(object):
 
     product_url = 'https://www.noone.ru/product/'
 
+    sizes_catalog = {}
+    sizes_product = {}
+    errors = {}
+
     def test_run(self):
 
         log(test_start + " Время: {}".format(str(datetime.datetime.now())))
@@ -58,12 +64,13 @@ class RunFullCatalog(object):
             self.auth_fields()
             WebDriverWait(self.driver, 10).until(EC.invisibility_of_element((By.XPATH, '//a[@id="modal-auth-phone"]')))
 
+            # Открытие URL, собираем информацию по размерам (и др., по необходимости добавим)
             sizes_list_catalog['female'].append(self.run_catalog_shoes_f())
-            # self.run_catalog_bags_f()
-            # self.run_catalog_accessories_f()
             sizes_list_catalog['male'].append(self.run_catalog_shoes_m())
-            # self.run_catalog_bags_m()
-            # self.run_catalog_accessories_m()
+
+            # Далее нужно чтобы он сравнивал собранные данные
+            self.data_compare()
+            self.create_report()
 
         except Exception as e:
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
@@ -96,21 +103,44 @@ class RunFullCatalog(object):
         log("Перейти по логотипу на главную страницу")
 
     def run_catalog_sizes(self):
-        sizes_catalog = {}
+        global sizes_catalog
         items = self.driver.find_elements_by_xpath('//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"]')
         for item in items:
             item_id = item.get_attribute('href').replace('/', '').replace('product', '')
             for size_info in item.find_elements_by_xpath('//ul[@class="item-sizes"]'):
                 for size in size_info:
                     sizes_catalog[item_id].append(size.get_attribute('data-text'))
-        return sizes_catalog
 
-    def run_item_page(self, item_id):
-        self.driver.get(item_id)
+    def run_product_sizes(self):
+        global sizes_product
+        sizes = self.driver.find_elements_by_xpath('//div[@class="item-info"]//ul[@class="item-size-list"]/li')
+        item_id = re.sub('[^0-9]', '', self.driver.current_url)
+        for size in sizes:
+            sizes_product[item_id].append(size)
+            sizes_product['url'].append(self.driver.current_url)
+
+    # def run_item_page(self, item_id):
+    #     self.driver.get(item_id)
+
+    def scroll_through_page_and_switch(self):
+        last_page = self.driver.find_element_by_xpath('//ul[@class="pagination-list"]/li[last()]/a').get_attribute('data-page')
+        current_page = re.sub('[^0-9]', '', self.driver.current_url)
+        while self.driver.find_element_by_xpath('//ul[@class="pagination-list"]/li[@class="is-active"]').text != last_page:
+            self.run_catalog_sizes()
+            items = self.driver.find_elements_by_xpath('//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"]')
+            for item in items:
+                item.click()
+                self.run_product_sizes()
+                self.noone.go_back()
+            try:
+                self.noone.next_page.click()
+            except:
+                break
+            WebDriverWait(self.driver, 10).until(EC.url_contains(current_page))
 
     def run_catalog_shoes_f(self):
         self.driver.get(self.shoes_f_url)
-        return self.run_catalog_sizes()
+        self.scroll_through_page_and_switch()
 
     # def run_catalog_bags_f(self):
     #     self.driver.get(self.bags_f_url)
@@ -122,7 +152,7 @@ class RunFullCatalog(object):
 
     def run_catalog_shoes_m(self):
         self.driver.get(self.shoes_m_url)
-        return self.run_catalog_sizes()
+        self.scroll_through_page_and_switch()
 
     # def run_catalog_bags_m(self):
     #     self.driver.get(self.bags_m_url)
@@ -131,6 +161,20 @@ class RunFullCatalog(object):
     # def run_catalog_accessories_m(self):
     #     self.driver.get(self.accessories_m_url)
     #     pass
+
+    def data_compare(self):
+        for k, v in self.sizes_catalog.items():
+            if v != self.sizes_product[k]:
+                global errors
+                errors['item_id'].append(k)
+                errors['link'].append(sizes_product['url'])
+
+    def create_report(self):
+        with open('{}.json'.format(str(datetime.datetime.now())), 'w') as t:
+            json.dump(self.errors, t, ensure_ascii=False, indent=4)
+            t.close()
+
+    # TODO: Ниже находятся методы для будущих доработок
 
     @staticmethod
     def scan(params=1):
