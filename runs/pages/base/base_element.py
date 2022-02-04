@@ -29,7 +29,7 @@ class BaseElement(object):
 
     def click(self):
         element = WebDriverWait(self.driver, 10)\
-            .until(EC.element_to_be_clickable(locator=self.locator))
+            .until(EC.element_to_be_clickable(self.locator))
         element.click()
         return None
 
