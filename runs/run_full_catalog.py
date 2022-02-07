@@ -41,7 +41,8 @@ class RunFullCatalog(object):
 
     actions = ActionChains(driver)
 
-    shoes_f_url = 'https://www.noone.ru/catalog/zhenskoe/obuv/'
+    shoes_f_url = 'https://www.noone.ru/catalog/zhenskoe/obuv/?PAGE=1'
+    # shoes_f_url_test = 'https://oneway:eehooXi8@dm1.noone.ru/catalog/zhenskoe/obuv/'
     bags_f_url = 'https://www.noone.ru/catalog/zhenskoe/sumki/'
     accessories_f_url = 'https://www.noone.ru/catalog/zhenskoe/aksessuary/'
     shoes_m_url = 'https://www.noone.ru/catalog/muzhskoe/obuv/'
@@ -50,9 +51,15 @@ class RunFullCatalog(object):
 
     product_url = 'https://www.noone.ru/product/'
 
+    project_url = 'http://proj.noone.ru/issues/137780'
+    login = 'm.romantsov'
+    password = 'KwMuP7UXcC'
+
     sizes_catalog = {}
     sizes_product = {}
     errors = {}
+
+    page_number = 1
 
     def test_run(self):
 
@@ -80,15 +87,16 @@ class RunFullCatalog(object):
             except:
                 print("Error: ")
                 exceptions.exception("message")
-            try:
-                self.run_catalog_shoes_m()
-            except:
-                print("Error: ")
-                exceptions.exception("message")
+            # try:
+            #     self.run_catalog_shoes_m()
+            # except:
+            #     print("Error: ")
+            #     exceptions.exception("message")
 
             # Далее нужно чтобы он сравнивал собранные данные
             self.data_compare()
             self.create_report()
+            self.post_report()
 
         except Exception as e:
             exceptions.exception('message')
@@ -135,12 +143,16 @@ class RunFullCatalog(object):
         count = 0
         for item in items:
             count += 1
-            item_id = str(item.get_attribute('href')).replace('/', '').replace('product', '')
-            print(count)
-            for size_info in item.find_elements_by_xpath('//ul[@class="item-sizes"]/li'):
-                # for size in size_info.find_elements_by_xpath('//li'):
-                # FIXME!
-                self.sizes_catalog.setdefault(item_id.strip(), []).append(size_info.get_attribute('data-text'))
+            item_id = re.sub('[^0-9]', '', str(self.driver.find_element(
+                By.XPATH,
+                '//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][{}]/div/a'.format(count)
+            ).get_attribute('href')))
+            for size_info in self.driver.find_elements(
+                    By.XPATH,
+                    '//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][{}]'
+                    '//ul[@class="item-sizes"]/li'.format(count)
+            ):
+                self.sizes_catalog.setdefault(item_id, []).append(size_info.get_attribute('data-text'))
 
     def run_product_sizes(self):
         """
@@ -148,10 +160,18 @@ class RunFullCatalog(object):
         :return:
         """
         sizes = self.driver.find_elements(By.XPATH, '//div[@class="item-info"]//ul[@class="item-size-list"]/li')
-        item_id = re.sub('[^0-9]', '', self.driver.current_url)
+
+        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((
+            By.XPATH, '//div[@class="item-gallery"]/a[@class="text-link"]'
+        )))
+        item_id = re.sub('[^0-9]', '', self.driver.find_element(
+            By.XPATH, '//div[@class="item-gallery"]/a[@class="text-link"]').get_attribute('href'))
+
+        self.sizes_product[item_id] = {'sizes': [], 'url': ''}
         for size in sizes:
-            self.sizes_product.setdefault(item_id, []).append(size)
-            self.sizes_product.setdefault('url', []).append(self.driver.current_url)
+            self.sizes_product[item_id]['sizes'].append(size.get_attribute('data-size'))
+            self.sizes_product[item_id]['url'] = self.driver.find_element(
+                By.XPATH, '//div[@class="item-gallery"]/a[@class="text-link"]').get_attribute('href')
 
     # def run_item_page(self, item_id):
     #     self.driver.get(item_id)
@@ -162,8 +182,9 @@ class RunFullCatalog(object):
         инфу каталога и инфу со страниц товаров в разные переменные.
         :return:
         """
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, '//ul[@class="pagination-list"]/li[last()]/a')))
         last_page = self.driver.find_element(By.XPATH, '//ul[@class="pagination-list"]/li[last()]/a').get_attribute('data-page')
-        current_page = re.sub('[^0-9]', '', self.driver.current_url)
         while self.driver.find_element(By.XPATH, '//ul[@class="pagination-list"]/li[@class="is-active"]').text != last_page:
             self.run_catalog_sizes()
             items = self.driver.find_elements(By.XPATH, '//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"]')
@@ -171,31 +192,35 @@ class RunFullCatalog(object):
                 preview_btn = '//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][{}]' \
                               '//div[@class="btn-item-view js-item-view"]'.format(n)
                 preview_close = '//div[@class="modal-body"]//button[@class="bootbox-close-button close"]'
-                # self.driver.execute_script('''window.open("{}","_blank");'''.format(
-                #     self.driver.find_element(By.XPATH,
-                #                              '//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][{}]'
-                #                              '//a[@class="item-link js-item-link"]'.format(n)).get_attribute('href')
-                # ))
-                # default_window = self.driver.window_handles[0]
-                # new_window = self.driver.window_handles[-1]
-                # self.driver.switch_to.window(new_window)
-                self.actions.move_to_element(self.driver.find_element(By.XPATH,
+                self.actions.move_to_element(self.driver.find_element(
+                    By.XPATH,
                     '//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][{}]'.format(n))).perform()
                 WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
                     (By.XPATH, '//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][{}]'
                                '//div[@class="btn-item-view js-item-view"]'.format(n))
                 ))
                 self.noone.catalog_nth_item(n).hover_center()
-                self.item(preview_btn)
+                try:
+                    WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, preview_btn)))
+                    self.item(preview_btn)
+                except:
+                    self.actions.move_to_element(self.driver.find_element(By.XPATH, preview_btn)).perform()
+                    self.item(preview_btn)
                 self.run_product_sizes()
+                WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, preview_close)))
                 self.item(preview_close)
-                # self.driver.close()
-                # self.driver.switch_to.window(default_window)
-            try:
-                self.noone.next_page.click()
-            except:
-                return
-            WebDriverWait(self.driver, 10).until(EC.url_contains(current_page))
+            self.next_page()
+
+    def next_page(self):
+        current_page = re.sub('[^0-9]', '', self.driver.current_url)
+        try:
+            WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
+                (By.XPATH, '//ul[@class="pagination-list"]//a[contains(text(), "Вперед")]')))
+            self.noone.next_page.click()
+        except:
+            return
+        self.page_number = current_page
+        print("Page " + current_page + " completed.")
 
     def run_catalog_shoes_f(self):
         self.driver.get(self.shoes_f_url)
@@ -224,14 +249,32 @@ class RunFullCatalog(object):
 
     def data_compare(self):
         for k, v in self.sizes_catalog.items():
-            if v != self.sizes_product[k]:
-                self.errors.setdefault('item_id', []).append(k)
-                self.errors.setdefault('link', []).append(self.sizes_product['url'])
+            try:
+                if v != self.sizes_product[k]['sizes']:
+                    print(v, self.sizes_product[k]['sizes'], self.sizes_product[k]['url'])
+                    self.errors.setdefault('item_id', []).append([k, self.sizes_product[k]['url'], self.page_number])
+            except:
+                self.sizes_product[k]['sizes'] = None
 
     def create_report(self):
-        with open('{}.json'.format(str(datetime.datetime.now())), 'w') as t:
-            json.dump(self.errors, t, ensure_ascii=False, indent=4)
+        with open('{}.json'.format(str(datetime.datetime.now())[:-7].replace(':', '-')), 'w') as t:
+            if self.errors == {}:
+                json.dump({"errors": 'None'}, t, ensure_ascii=False, indent=4)
+            else:
+                json.dump(self.errors, t, ensure_ascii=False, indent=4)
             t.close()
+
+    def post_report(self):
+        self.driver.get(self.project_url)
+        self.driver.find_element(By.XPATH, '//span[contains(text(), "Редактировать")][1]').click()
+        self.driver.find_element(By.XPATH, '//textarea[@id="issue_notes"]')\
+            .send_keys("Данный пост создан автоматически по завершению автотеста. \n")
+        self.driver.find_element(By.XPATH, '//textarea[@id="issue_notes"]').send_keys('<pre><code class="json">\n')
+        self.driver.find_element(By.XPATH, '//textarea[@id="issue_notes"]')\
+            .send_keys(json.dumps(self.errors, ensure_ascii=False, indent=4))
+        self.driver.find_element(By.XPATH, '//textarea[@id="issue_notes"]').send_keys('\n<pre><code>')
+        self.driver.find_element(By.XPATH, '//input[@name="commit" and contains(@value, "Принять")]').click()
+        time.sleep(5)
 
     # TODO: Ниже находятся методы для будущих доработок
 
