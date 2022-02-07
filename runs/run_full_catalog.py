@@ -254,7 +254,7 @@ class RunFullCatalog(object):
                     print(v, self.sizes_product[k]['sizes'], self.sizes_product[k]['url'])
                     self.errors.setdefault('item_id', []).append([k, self.sizes_product[k]['url'], self.page_number])
             except:
-                self.sizes_product[k]['sizes'] = None
+                pass
 
     def create_report(self):
         with open('{}.json'.format(str(datetime.datetime.now())[:-7].replace(':', '-')), 'w') as t:
@@ -266,7 +266,13 @@ class RunFullCatalog(object):
 
     def post_report(self):
         self.driver.get(self.project_url)
+        self.driver.find_element(By.XPATH, '//input[@id="username"]').send_keys(self.login)
+        self.driver.find_element(By.XPATH, '//input[@id="password"]').send_keys(self.password)
+        self.driver.find_element(By.XPATH, '//input[@id="login-submit"]').click()
+        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((
+            By.XPATH, '//span[contains(text(), "Редактировать")][1]')))
         self.driver.find_element(By.XPATH, '//span[contains(text(), "Редактировать")][1]').click()
+        time.sleep(0.3)
         self.driver.find_element(By.XPATH, '//textarea[@id="issue_notes"]')\
             .send_keys("Данный пост создан автоматически по завершению автотеста. \n")
         self.driver.find_element(By.XPATH, '//textarea[@id="issue_notes"]').send_keys('<pre><code class="json">\n')
