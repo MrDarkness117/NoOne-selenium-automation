@@ -3,6 +3,7 @@ import random
 import time
 import json
 import re
+import schedule
 import logging as exceptions
 
 from os import path
@@ -45,7 +46,7 @@ class RunFullCatalog(object):
     # shoes_f_url_test = 'https://oneway:eehooXi8@dm1.noone.ru/catalog/zhenskoe/obuv/'
     bags_f_url = 'https://www.noone.ru/catalog/zhenskoe/sumki/'
     accessories_f_url = 'https://www.noone.ru/catalog/zhenskoe/aksessuary/'
-    shoes_m_url = 'https://www.noone.ru/catalog/muzhskoe/obuv/'
+    shoes_m_url = 'https://www.noone.ru/catalog/muzhskoe/obuv/?PAGE=1'
     bags_m_url = 'https://www.noone.ru/catalog/muzhskoe/sumki/'
     accessories_m_url = 'https://www.noone.ru/catalog/muzhskoe/aksessuary/'
 
@@ -54,6 +55,10 @@ class RunFullCatalog(object):
     project_url = 'http://proj.noone.ru/issues/137780'
     login = 'm.romantsov'
     password = 'KwMuP7UXcC'
+
+    mail_url = 'https://mail.noone.ru/'
+    login_mail = 'm.romantsov@noone.ru'
+    pass_mail = 'Test_001'
 
     sizes_catalog = {}
     sizes_product = {}
@@ -87,16 +92,18 @@ class RunFullCatalog(object):
             except:
                 print("Error: ")
                 exceptions.exception("message")
-            # try:
-            #     self.run_catalog_shoes_m()
-            # except:
-            #     print("Error: ")
-            #     exceptions.exception("message")
+            try:
+                self.run_catalog_shoes_m()
+            except:
+                print("Error: ")
+                exceptions.exception("message")
 
             # Далее нужно чтобы он сравнивал собранные данные
             self.data_compare()
             self.create_report()
             self.post_report()
+            if json.dumps(self.errors) != '{}':
+                self.send_report()
 
         except Exception as e:
             exceptions.exception('message')
@@ -170,6 +177,9 @@ class RunFullCatalog(object):
         self.sizes_product[item_id] = {'sizes': [], 'url': ''}
         for size in sizes:
             self.sizes_product[item_id]['sizes'].append(size.get_attribute('data-size'))
+        if self.driver.find_element(By.XPATH, '//div[@class="item-gallery"]/a[@class="text-link"]').get_attribute('href') == '':
+            self.sizes_product[item_id]['url'] = "Отсуствтует ссылка"
+        else:
             self.sizes_product[item_id]['url'] = self.driver.find_element(
                 By.XPATH, '//div[@class="item-gallery"]/a[@class="text-link"]').get_attribute('href')
 
@@ -192,23 +202,27 @@ class RunFullCatalog(object):
                 preview_btn = '//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][{}]' \
                               '//div[@class="btn-item-view js-item-view"]'.format(n)
                 preview_close = '//div[@class="modal-body"]//button[@class="bootbox-close-button close"]'
-                self.actions.move_to_element(self.driver.find_element(
-                    By.XPATH,
-                    '//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][{}]'.format(n))).perform()
-                WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
-                    (By.XPATH, '//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][{}]'
-                               '//div[@class="btn-item-view js-item-view"]'.format(n))
-                ))
-                self.noone.catalog_nth_item(n).hover_center()
                 try:
-                    WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, preview_btn)))
-                    self.item(preview_btn)
-                except:
-                    self.actions.move_to_element(self.driver.find_element(By.XPATH, preview_btn)).perform()
-                    self.item(preview_btn)
-                self.run_product_sizes()
-                WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, preview_close)))
-                self.item(preview_close)
+                    self.actions.move_to_element(self.driver.find_element(
+                        By.XPATH,
+                        '//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][{}]'.format(n))).perform()
+                    WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
+                        (By.XPATH, '//div[@id="catalog"]//div[@class="col lg:col-4 xs:col-6"][{}]'
+                                   '//div[@class="btn-item-view js-item-view"]'.format(n))
+                    ))
+                    self.noone.catalog_nth_item(n).hover_center()
+                    try:
+                        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, preview_btn)))
+                        self.item(preview_btn)
+                    except:
+                        self.actions.move_to_element(self.driver.find_element(By.XPATH, preview_btn)).perform()
+                        self.item(preview_btn)
+                    self.run_product_sizes()
+                    WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, preview_close)))
+                    self.item(preview_close)
+                except Exception as e:
+                    self.noone.go_refresh()
+                    exceptions.exception(e)
             self.next_page()
 
     def next_page(self):
@@ -250,16 +264,20 @@ class RunFullCatalog(object):
     def data_compare(self):
         for k, v in self.sizes_catalog.items():
             try:
+                self.sizes_product[k]['sizes'] = list(dict.fromkeys(self.sizes_product[k]['sizes']))
+                self.sizes_catalog[k] = list(dict.fromkeys(self.sizes_catalog['item_id']))
                 if v != self.sizes_product[k]['sizes']:
                     print(v, self.sizes_product[k]['sizes'], self.sizes_product[k]['url'])
-                    self.errors.setdefault('item_id', []).append([k, self.sizes_product[k]['url'], self.page_number])
+                    self.errors.setdefault('item_id', []).append(
+                        [k, self.sizes_product[k]['url'], self.page_number,
+                         {'s_cat': v, 's_prod': self.sizes_product[k]['sizes']}])
             except:
                 pass
 
     def create_report(self):
         with open('{}.json'.format(str(datetime.datetime.now())[:-7].replace(':', '-')), 'w') as t:
-            if self.errors == {}:
-                json.dump({"errors": 'None'}, t, ensure_ascii=False, indent=4)
+            if json.dumps(self.errors) == '{}':
+                json.dump({"errors": 'Всё отлично! Ошибок нет.'}, t, ensure_ascii=False, indent=4)
             else:
                 json.dump(self.errors, t, ensure_ascii=False, indent=4)
             t.close()
@@ -281,6 +299,26 @@ class RunFullCatalog(object):
         self.driver.find_element(By.XPATH, '//textarea[@id="issue_notes"]').send_keys('\n<pre><code>')
         self.driver.find_element(By.XPATH, '//input[@name="commit" and contains(@value, "Принять")]').click()
         time.sleep(5)
+
+    def send_report(self):
+        self.driver.get(self.mail_url)
+        self.driver.find_element(By.XPATH, '//input[@id="name"]').send_keys(self.login_mail)
+        self.driver.find_element(By.XPATH, '//input[@id="password"]').send_keys(self.pass_mail)
+        self.driver.find_element(By.XPATH, '//input[@type="submit"]').click()
+        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//td[@id="zb__NEW_MENU_title"]')))
+        self.driver.find_element(By.XPATH, '//td[@id="zb__NEW_MENU_title"]').click()
+        for p in ["Анастасия Боева", "Алексей Юн", "Сергей Журавлев"]:
+            address = self.driver.find_element(By.XPATH, '//div[@id="DWT52"]')
+            address.click()
+            address.send_keys(p)
+            WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
+                (By.XPATH, '//td[contains(text(), "{}")]'.format(p))
+            ))
+            self.driver.find_element(By.XPATH, '//td[contains(text(), "{}")]'.format(p)).click()
+        self.driver.find_element(By.XPATH, '//input[@id="zv__COMPOSE-1_subject_control"]')\
+            .send_keys("Автотест размеры {}".format(datetime.date.today()))
+        self.driver.find_element(By.XPATH, '//body[@id="tinymce"]').send_keys(self.errors)
+        self.driver.find_element(By.XPATH, '//div[@id="zb__COMPOSE-1__SEND_MENU"]').click()
 
     # TODO: Ниже находятся методы для будущих доработок
 
@@ -343,5 +381,6 @@ test_start = "=" * 5 + "Начало тестирования {}.".format(RunFul
 
 
 if __name__ == '__main__':
-    RunFullCatalog().test_run()
-    test_start = "=" * 5 + "Начало тестирования."
+    schedule.every().day.at("01:00").do(RunFullCatalog().test_run())
+    while True:
+        schedule.run_pending()
