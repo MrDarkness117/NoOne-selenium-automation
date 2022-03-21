@@ -4,6 +4,7 @@ import time
 import json
 
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -21,7 +22,8 @@ class RunCart(object):
     # Настройки
 
     options = Options()
-    driver = webdriver.Chrome(options=options)
+    # driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), options=options)
     driver.set_window_position(-2000, 0)
     driver.maximize_window()
     driver.implicitly_wait(3)
@@ -190,7 +192,8 @@ class RunCart(object):
 
     def item_size_click(self):
         try:
-            random_size = random.randint(1, len(self.driver.find_elements_by_xpath(
+            random_size = random.randint(1, len(self.driver.find_elements(
+                By.XPATH,
                 '//div[@class="select item-size-list js-item-size-list select-open"]'
                 '//ul[@class="select-list"]'
                 '//li[@class="select-item item-size"]'

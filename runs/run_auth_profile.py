@@ -1,25 +1,15 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from runs.pages.auth_profile_page import AuthProfilePage as Page
 from runs.pages.base.logging_report import LogReport, Logging, TakeScreenshot
+from selenium.webdriver.support.wait import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
+from logging import exception
 import datetime
-
-# log = '=' * 90 + "\n"
-# n = 0
-#
-#
-# def log(report):
-#     global log
-#     global n
-#     if report[0] != '=':
-#         if report[0] != '/':
-#             n += 1
-#             log += str(n) + '. ' + report + "\n"
-#         else:
-#             log += report + '\n'
-#     else:
-#         log += report + '\n'
+import random
 
 logging = Logging()
 log = logging.logger
@@ -30,7 +20,10 @@ class RunAuthProfile(object):
 
     options = Options()
     options.add_argument("--window-position=-2000,0")
-    driver = webdriver.Chrome(options=options)
+    prefs = {"profile.managed_default_content_settings.images": 2}
+    options.add_experimental_option('prefs', prefs)
+    # driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.set_window_position(-2000, 0)
     driver.maximize_window()
     driver.implicitly_wait(3)
@@ -51,8 +44,10 @@ class RunAuthProfile(object):
             # self.noone.region_confirm.click()
 
             # Действия Cart Page
-            self.auth()
-            self.auth_fields()
+            # self.auth()
+            # self.auth_fields()
+            for n in range(0, 10):
+                self.auth_sms()
             self.foot_size_select()
             self.cloth_size_select()
             self.accept_and_save()
@@ -62,28 +57,53 @@ class RunAuthProfile(object):
             self.open_sections()
             self.log_out()
         except Exception as e:
+            print(exception(e))
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
             TakeScreenshot(RunAuthProfile()).take_screenshot()
 
         log('=' * 5 + "Завершение тестирования.")
-        self.driver.quit()
+        # self.driver.quit()
         LogReport(logs=logging.log, testblock=RunAuthProfile()).test_results()
 
     # Команды
 
     def auth(self):
-        log("Открыть окно авторизации")
+        WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, '//li[@class="nav-item nav-item-auth"]')))
         self.noone.auth_page.click()
+        log("Открыть окно авторизации")
+        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//a[@href="#modal-auth-email"]')))
+        self.noone.auth_email_login.click()
+        log("Перейти на вход по email")
+
+    def auth_sms(self):
+        try:
+            WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, '//li[@class="nav-item nav-item-auth"]')))
+            self.noone.auth_page.click()
+            phone = random.randrange(9000000000, 9999999999)
+            self.noone.auth_sms_field.input_text(phone)
+            print('entered ' + str(phone))
+            self.noone.auth_send_code.click()
+            self.noone.auth_modal_close.click()
+            self.driver.find_element(By.XPATH, '//*[@id="modal-auth-phone"]/div/div/div[1]/button').click()
+            self.driver.refresh()
+        except:
+            frame = self.driver.find_element(By.XPATH, '//iframe[@id="fl-572001"]')
+            self.driver.switch_to.frame(frame)
+            self.driver.find_element_by_xpath('//button[@class ="pc__close"]').click()
+            self.driver.switch_to.default_content()
+            self.auth_sms()
 
     def auth_fields(self):
         auth_info = {
             'login': 'm.romantsov@noone.ru',
             'password': 'Mihailo117'
         }
-        log("Ввести логин/пароль, нажать 'войти'")
         self.noone.auth_field_login.input_text(auth_info['login'])
         self.noone.auth_field_pass.input_text(auth_info['password'])
         self.noone.auth_field_button.click()
+        log("Ввести логин/пароль, нажать 'войти'")
 
     def foot_size_select(self):
         log("Выбрать размер обуви")
