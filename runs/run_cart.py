@@ -10,8 +10,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
-from runs.pages.cart_page import CartPage as Page
-from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
+from pages.cart_page import CartPage as Page
+from pages.base.logging_report import Logging, LogReport, TakeScreenshot
 
 logging = Logging()
 log = logging.logger
@@ -22,8 +22,15 @@ class RunCart(object):
     # Настройки
 
     options = Options()
+<<<<<<< HEAD
+    prefs = {"profile.managed_default_content_settings.images": 2}
+    options.add_experimental_option('prefs', prefs)
+    # driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+=======
     # driver = webdriver.Chrome(options=options)
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), options=options)
+>>>>>>> 7b76d86ac613af34de1453fd64d51d1f818a4af3
     driver.set_window_position(-2000, 0)
     driver.maximize_window()
     driver.implicitly_wait(3)
@@ -70,7 +77,7 @@ class RunCart(object):
                     except:
                         log('/'*10 + "Отсутствует модальное окно" + '\\'*10)
 
-                with open('ids.json') as i:
+                with open('C:\\Users\\admin\\Documents\\GitHub\\NoOne-selenium-automation\\runs\\ids.json') as i:
                     data = json.load(i)
 
                 if len(data) > 0:
