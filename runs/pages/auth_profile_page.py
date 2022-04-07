@@ -1,12 +1,12 @@
 from .base.locator import Locator
-from .base.base_page import BasePage
 from .base.base_element import BaseElement
+from ._core import CoreLocators
 from selenium.webdriver.common.by import By
 
 
-class AuthProfilePage(BasePage):
+class AuthProfilePage(CoreLocators):
 
-    url = "https://noone.ru/"
+    url = "https://oneway:eehooXi8@dm2.noone.ru/"
 
     def ID(self, value):
         """
@@ -88,28 +88,32 @@ class AuthProfilePage(BasePage):
         return self.XPATH('//li[@class="nav-item nav-item-auth"]')
 
     @property
+    def auth_email_login(self):
+        return self.XPATH('//a[@href="#modal-auth-email"]')
+
+    @property
     def auth_field_login(self):
-        """
-        Логин
-        :return:
-        """
-        return self.XPATH('//fieldset[@class="form-fields"]//input[@name="USER_LOGIN"]')
+        return self.XPATH('//input[@name="USER_LOGIN"]')
 
     @property
     def auth_field_pass(self):
-        """
-        Пароль
-        :return:
-        """
-        return self.XPATH('//fieldset[@class="form-fields"]//input[@name="USER_PASSWORD"]')
+        return self.XPATH('//input[@name="USER_PASSWORD"]')
 
     @property
     def auth_field_button(self):
-        """
-        Кнопка аутентификации
-        :return:
-        """
-        return self.XPATH('//button[@name="Login"]')
+        return self.XPATH('//button[contains(text(), "Войти в аккаунт")]')
+
+    @property
+    def auth_sms_field(self):
+        return self.XPATH('//input[@name="USER_PHONE"]')
+
+    @property
+    def auth_send_code(self):
+        return self.XPATH('//button[contains(text(), "Получить код")]')
+
+    @property
+    def auth_modal_close(self):
+        return self.XPATH('//*[@id="modal-sms-code"]/div/div/div[1]/button')
 
     # Личные данные
 

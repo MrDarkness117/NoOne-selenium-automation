@@ -22,10 +22,15 @@ class RunCart(object):
     # Настройки
 
     options = Options()
+<<<<<<< HEAD
     prefs = {"profile.managed_default_content_settings.images": 2}
     options.add_experimental_option('prefs', prefs)
     # driver = webdriver.Chrome(options=options)
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+=======
+    # driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), options=options)
+>>>>>>> 7b76d86ac613af34de1453fd64d51d1f818a4af3
     driver.set_window_position(-2000, 0)
     driver.maximize_window()
     driver.implicitly_wait(3)
@@ -194,7 +199,7 @@ class RunCart(object):
 
     def item_size_click(self):
         try:
-            random_size = random.randint(1, len(self.driver.find_elements_by_xpath(
+            random_size = random.randint(1, len(self.driver.find_elements(
                 '//div[@class="select item-size-list js-item-size-list select-open"]'
                 '//ul[@class="select-list"]'
                 '//li[@class="select-item item-size"]'
