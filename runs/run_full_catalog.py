@@ -3,7 +3,7 @@ import random
 import time
 import json
 import re
-import schedule
+# import schedule
 import logging as exceptions
 
 from os import path
@@ -14,8 +14,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
-from runs.pages.full_catalog_page import FullCatalog as Page
-from runs.pages.base.logging_report import Logging, LogReport, TakeScreenshot
+from pages.full_catalog_page import FullCatalog as Page
+from pages.base.logging_report import Logging, LogReport, TakeScreenshot
 
 logging = Logging()
 log = logging.logger
@@ -28,8 +28,8 @@ class RunFullCatalog(object):
     options = Options()
     prefs = {"profile.managed_default_content_settings.images": 2}
     options.add_experimental_option('prefs', prefs)
-    driver = webdriver.Chrome(options=options)
-    # driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+    # driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.set_window_position(-2000, 0)
     driver.maximize_window()
     driver.implicitly_wait(3)
@@ -381,6 +381,7 @@ test_start = "=" * 5 + "Начало тестирования {}.".format(RunFul
 
 
 if __name__ == '__main__':
-    schedule.every().day.at("01:00").do(RunFullCatalog().test_run())
-    while True:
-        schedule.run_pending()
+    RunFullCatalog().test_run()
+    # schedule.every().day.at("01:00").do(RunFullCatalog().test_run())
+    # while True:
+    #     schedule.run_pending()

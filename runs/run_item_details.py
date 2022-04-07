@@ -1,8 +1,9 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
-from runs.pages.auth_profile_page import AuthProfilePage as Page
-from runs.pages.base.logging_report import LogReport, Logging, TakeScreenshot
+from pages.auth_profile_page import AuthProfilePage as Page
+from pages.base.logging_report import LogReport, Logging, TakeScreenshot
+from webdriver_manager.chrome import ChromeDriverManager
 import datetime
 
 logging = Logging()
@@ -14,7 +15,8 @@ class RunAuthProfile(object):
 
     options = Options()
     options.add_argument("--window-position=-2000,0")
-    driver = webdriver.Chrome(options=options)
+    # driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.set_window_position(-2000, 0)
     driver.maximize_window()
     driver.implicitly_wait(3)
