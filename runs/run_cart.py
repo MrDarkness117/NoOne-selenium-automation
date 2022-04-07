@@ -200,6 +200,7 @@ class RunCart(object):
     def item_size_click(self):
         try:
             random_size = random.randint(1, len(self.driver.find_elements(
+                By.XPATH,
                 '//div[@class="select item-size-list js-item-size-list select-open"]'
                 '//ul[@class="select-list"]'
                 '//li[@class="select-item item-size"]'
