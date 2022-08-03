@@ -6,7 +6,8 @@ from selenium.webdriver.common.by import By
 
 class AuthProfilePage(CoreLocators):
 
-    url = "https://oneway:eehooXi8@dm2.noone.ru/"
+    # url = "https://oneway:eehooXi8@dm2.noone.ru/"
+    url = "https://www.noone.ru/"
 
     def ID(self, value):
         """

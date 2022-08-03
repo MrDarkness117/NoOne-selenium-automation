@@ -46,15 +46,15 @@ class RunAuthProfile(object):
             # Действия Cart Page
             # self.auth()
             # self.auth_fields()
-            for n in range(0, 10):
+            for n in range(0, 100):
                 self.auth_sms()
-            self.foot_size_select()
-            self.cloth_size_select()
-            self.accept_and_save()
-            self.section_favs()
-            self.section_recs()
-            self.section_views()
-            self.open_sections()
+            # self.foot_size_select()
+            # self.cloth_size_select()
+            # self.accept_and_save()
+            # self.section_favs()
+            # self.section_recs()
+            # self.section_views()
+            # self.open_sections()
             self.log_out()
         except Exception as e:
             print(exception(e))

@@ -1,3 +1,4 @@
+import traceback
 import datetime
 import random
 import time
@@ -22,15 +23,10 @@ class RunCart(object):
     # Настройки
 
     options = Options()
-<<<<<<< HEAD
     prefs = {"profile.managed_default_content_settings.images": 2}
     options.add_experimental_option('prefs', prefs)
     # driver = webdriver.Chrome(options=options)
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-=======
-    # driver = webdriver.Chrome(options=options)
-    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), options=options)
->>>>>>> 7b76d86ac613af34de1453fd64d51d1f818a4af3
     driver.set_window_position(-2000, 0)
     driver.maximize_window()
     driver.implicitly_wait(3)
@@ -131,6 +127,7 @@ class RunCart(object):
         except Exception as e:
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
             print(e)
+            traceback.print_tb(e.__traceback__)
             TakeScreenshot(RunCart()).take_screenshot()
 
         log("="*5 + "Завершение тестирования.")
@@ -147,37 +144,42 @@ class RunCart(object):
         log("Перейти на вход по email")
 
     def auth_fields(self):
+        log("Ввести логин/пароль, нажать 'войти'")
         auth_info = {
             'login': 'm.romantsov@noone.ru',
             'password': 'Mihailo117'
         }
         self.noone.auth_field_login.input_text(auth_info['login'])
         self.noone.auth_field_pass.input_text(auth_info['password'])
+        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
+            self.driver.find_element(By.XPATH, '//button[contains(text(), "Войти в аккаунт")]')))
         self.noone.auth_field_button.click()
-        log("Ввести логин/пароль, нажать 'войти'")
 
     def logo(self):
-        self.noone.header_logo.click()
         log("Перейти по логотипу на главную страницу")
+        self.noone.header_logo.click()
 
     def cart_click(self):
-        self.noone.cart.click()
         log("Нажать на кнопку корзины товаров")
+        WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//a[@class="nav-link js-basket-line"]')))
+        self.noone.cart.click()
 
     def product_recommended_hover(self):
         try:
-            self.noone.dy_product_card.hover_center()
             log("Навести мышкой на товар снизу из списка")
+            self.noone.dy_product_card.hover_center()
         except:
             log('='*5 + "(?) Корзина уже не пустая. Удаляем товары.")
+            # WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.noone.item_delete))  # (self.noone.item_delete.locator))
             self.noone.item_delete.click()
             # self.cart_click()
             log("Навести мышкой на товар снизу из списка")
+            WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//div[@data-swiper-slide-index="0"]')))
             self.noone.dy_product_card.hover_center()
 
     def preview_click(self):
-        self.noone.dy_product_window.click()
         log("Нажать на появишвуюся кнопку предварительного просмотра товара")
+        self.noone.dy_product_window.click()
 
     def item_color_block(self):
         """
@@ -194,8 +196,8 @@ class RunCart(object):
             self.noone.item_color_element_single.click()
 
     def item_size_block_click(self):
-        self.noone.item_size_block.click()
         log("Нажать на окно размеров")
+        self.noone.item_size_block.click()
 
     def item_size_click(self):
         try:
@@ -445,11 +447,12 @@ class RunCart(object):
         self.noone.logo.click()
         self.noone.profile.hover_center()
         log("Перейти в раздел отмены заказа")
-        self.noone.profile_personal_info.click()
-        self.noone.profile_my_orders.click()
+        # self.noone.profile_personal_info.click()
+        # self.noone.profile_my_orders.click()
+        self.noone.profile_orders.click()
         log("Открыть окно заказа")
         try:
-            for i in range(1, 100):
+            for i in range(1, 150):
                 self.noone.profile_my_orders_open_order.click()
                 log("Удалить заказ")
                 self.noone.order_delete.click()

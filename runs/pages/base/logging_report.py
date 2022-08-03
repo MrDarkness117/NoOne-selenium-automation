@@ -1,6 +1,8 @@
 import datetime
 import os
 
+from pathlib import Path
+
 
 def return_testblock(cls_name):
     """
@@ -39,11 +41,11 @@ class LogReport(object):
         где RunClass() - пример передаваемого название класса self.testblock для отчётов
         :return:
         """
-        newpath = '.\\reports'
+        newpath = str(Path.home()) + '\\Documents\\reports'
         if not os.path.exists(newpath):
             os.makedirs(newpath)
 
-        with open(".\\reports\\" + return_testblock(self.testblock) + ' ' +
+        with open(str(Path.home()) + "\\Documents\\reports\\" + return_testblock(self.testblock) + ' ' +
                   str(datetime.datetime.now()).replace(':', '-')[:-7] + "_" +
                   '_report.txt', 'w') as report:
             report.write(self.BASE_INFO)
@@ -103,10 +105,10 @@ class TakeScreenshot(object):
         Сохранить скриншот с именем self.testblock
         :return:
         """
-        newpath = '.\\screenshots'
+        newpath = str(Path.home()) + '\\Documents\\screenshots'
         if not os.path.exists(newpath):
             os.makedirs(newpath)
-        self.driver.save_screenshot('.\\screenshots\\' + return_testblock(self.testblock) + ' ' +
+        self.driver.save_screenshot(str(Path.home()) + '\\Documents\\screenshots\\' + return_testblock(self.testblock) + ' ' +
                                     str(datetime.datetime.now()).replace(':', '-')[:-7] + "_" +
                                     '_screenshot.png')
 

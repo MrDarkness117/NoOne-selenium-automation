@@ -60,7 +60,8 @@ class CartPage(CoreLocators):
 
     @property
     def auth_email_login(self):
-        return self.XPATH('//a[@href="#modal-auth-email"]')
+        # return self.XPATH('//a[@href="#modal-auth-email"]')
+        return self.XPATH('//a[contains(text(), "По email")]')
 
     @property
     def auth_field_login(self):
@@ -567,7 +568,7 @@ class CartPage(CoreLocators):
         # btn btn-action btn-delete js-item-delete
         locator = Locator(
             by=By.XPATH,
-            value='//span[@id="remove-all-avaliable"]'
+            value='//span[contains(text(), "Очистить корзину")]'
         )
         return BaseElement(
             driver=self.driver,
@@ -605,6 +606,10 @@ class CartPage(CoreLocators):
         )
 
     @property
+    def profile_orders(self):
+        return self.XPATH('//div[@class="nav-item-dropdown"]//li[3]')
+
+    @property
     def profile_my_orders(self):
         """
         Удалить заказ
@@ -627,9 +632,8 @@ class CartPage(CoreLocators):
         """
         locator = Locator(
             by=By.XPATH,
-            # value='//div[@class="table-row js-order-row"][1]//div[@class="table-cell table-cell-action text-right"]'
-            #       '/span[@class="btn-collapse"]'
-            value='//div[@class="table-body"]/div[@class="table-row js-order-row"][1]/div[contains(text(), "Новый")]'
+            # value='//div[@class="table-body"]/div[@class="table-row js-order-row"][1]/div[contains(text(), "Новый")]'
+            value='//div[contains(@class, "table-cell table-cell-status")]//text()[contains(.,"Принят")]/../../..'
         )
         return BaseElement(
             driver=self.driver,
@@ -644,7 +648,8 @@ class CartPage(CoreLocators):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//a[@class="btn btn-default js-btn js-btn-order-cancel"]'
+            # value='//a[@class="btn btn-default js-btn js-btn-order-cancel"]'
+            value='//span[contains(text(), "Отменить")]'
         )
         return BaseElement(
             driver=self.driver,
@@ -659,7 +664,8 @@ class CartPage(CoreLocators):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//div[@class="bootbox modal bootbox-confirm in"]//button[@class="btn btn-primary bootbox-accept"]'
+            # value='//div[@class="bootbox modal bootbox-confirm in"]//button[@class="btn btn-primary bootbox-accept"]'
+            value='//div[@class="modal-footer"]/button[contains(text(), "Да")]'
         )
         return BaseElement(
             driver=self.driver,
@@ -674,7 +680,8 @@ class CartPage(CoreLocators):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//div[@class="bootbox modal bootbox-alert in"]//button[@class="btn btn-primary bootbox-accept"]'
+            # value='//div[@class="bootbox modal bootbox-alert in"]//button[@class="btn btn-primary bootbox-accept"]'
+            value='//button[contains(@class, "btn btn-primary bootbox-accept")]'
         )
         return BaseElement(
             driver=self.driver,
