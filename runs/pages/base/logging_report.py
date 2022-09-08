@@ -47,7 +47,7 @@ class LogReport(object):
 
         with open(str(Path.home()) + "\\Documents\\reports\\" + return_testblock(self.testblock) + ' ' +
                   str(datetime.datetime.now()).replace(':', '-')[:-7] + "_" +
-                  '_report.txt', 'w') as report:
+                  '_report.txt', 'w', encoding='utf-8') as report:
             report.write(self.BASE_INFO)
         report.close()
 

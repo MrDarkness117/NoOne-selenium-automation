@@ -169,7 +169,7 @@ class CartPage(CoreLocators):
         locator = Locator(
             by=By.XPATH,
             value='//div[@data-swiper-slide-index="0"]'
-                  '//div[@class="rr-item__view"]'
+                  '//div[@class="rr-quickviewLable"]'
         )
         return BaseElement(
             driver=self.driver,
@@ -359,6 +359,22 @@ class CartPage(CoreLocators):
         )
 
     @property
+    def label_pickup(self):
+        return self.XPATH('//label[contains(text(), "Самовывоз")]')
+
+    @property
+    def select_pickup(self):
+        return self.XPATH('//div[contains(text(), "выбрать пункт")]')
+
+    @property
+    def select_atrium(self):
+        return self.XPATH('//div[contains(text(), "Тверская 12")]/..')
+
+    @property
+    def select_map(self):
+        return self.XPATH('//ymaps/div[4]')
+
+    @property
     def form_check_save(self):
         """
         Флажок сохранения адреса
@@ -366,7 +382,7 @@ class CartPage(CoreLocators):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//div[@class="order-address-service"]//label[@class="form-check"]'
+            value='//span[contains(text(), "Сохранить адрес")]//..'
         )
         return BaseElement(
             driver=self.driver,
@@ -379,7 +395,7 @@ class CartPage(CoreLocators):
         Кнопка "Выбрать другой" адрес
         :return:
         """
-        return self.XPATH('//div[contains(text(), "Адрес доставки")]//span[contains(text(), "Выбрать другой")]')
+        return self.XPATH('//span[contains(text(), "Адрес доставки")]/..//span[contains(text(), "Выбрать другой")]')
 
     @property
     def form_address_select(self):
@@ -524,7 +540,7 @@ class CartPage(CoreLocators):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//textarea[@name="COMMENTS"]'
+            value='//textarea[@placeholder="Комментарий"]'
         )
         return BaseElement(
             driver=self.driver,
@@ -545,6 +561,7 @@ class CartPage(CoreLocators):
             locator=locator
         )
 
+    @property
     def order_btn(self):
         """
         Кнопка оформления заказа
@@ -552,7 +569,7 @@ class CartPage(CoreLocators):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//div[@id="cart-checkout-button"]//button'
+            value='//button[contains(text(), "Оплатить")]'
         )
         return BaseElement(
             driver=self.driver,
