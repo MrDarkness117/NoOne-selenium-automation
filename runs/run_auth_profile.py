@@ -40,22 +40,23 @@ class RunAuthProfile(object):
 
         try:
             # Стандартные действия
-            self.noone.cookies.click()
+            # self.noone.cookies.click()
             # self.noone.region_confirm.click()
 
             # Действия Cart Page
             # self.auth()
             # self.auth_fields()
-            for n in range(0, 10):
+            for n in range(0, 50):
                 self.auth_sms()
-            self.foot_size_select()
-            self.cloth_size_select()
-            self.accept_and_save()
-            self.section_favs()
-            self.section_recs()
-            self.section_views()
-            self.open_sections()
-            self.log_out()
+            # self.foot_size_select()
+            # self.cloth_size_select()
+            # self.accept_and_save()
+            # self.section_favs()
+            # self.section_recs()
+            # self.section_views()
+            # self.open_sections()
+            # self.log_out
+            self.driver.quit()
         except Exception as e:
             print(exception(e))
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))
@@ -77,23 +78,42 @@ class RunAuthProfile(object):
         log("Перейти на вход по email")
 
     def auth_sms(self):
-        try:
+        if self.driver.current_url.__contains__("dm2") or self.driver.current_url.__contains__("dm1"):
             WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH, '//li[@class="nav-item nav-item-auth"]')))
             self.noone.auth_page.click()
-            phone = random.randrange(9000000000, 9999999999)
+            phone_raw = random.randrange(9000000000, 9999999999)
+            print("+7" + str(phone_raw))
+            phone = "+7(" + str(phone_raw)[0:3] + ")" + str(phone_raw)[3:6] + "-" + str(phone_raw)[6:8] + '-' + \
+                    str(phone_raw)[8:10]
             self.noone.auth_sms_field.input_text(phone)
-            print('entered ' + str(phone))
+            # print(phone)
             self.noone.auth_send_code.click()
             self.noone.auth_modal_close.click()
-            self.driver.find_element(By.XPATH, '//*[@id="modal-auth-phone"]/div/div/div[1]/button').click()
+            # self.driver.find_element(By.XPATH, '//*[@id="modal-auth-phone"]/div/div/div[1]/button').click()
             self.driver.refresh()
-        except:
-            frame = self.driver.find_element(By.XPATH, '//iframe[@id="fl-572001"]')
-            self.driver.switch_to.frame(frame)
-            self.driver.find_element_by_xpath('//button[@class ="pc__close"]').click()
-            self.driver.switch_to.default_content()
-            self.auth_sms()
+        else:
+            try:
+                WebDriverWait(self.driver, 10).until(
+                    EC.element_to_be_clickable((By.XPATH, '//li[@class="nav-item nav-item-auth"]')))
+                self.noone.auth_page.click()
+                phone_raw = random.randrange(9000000000, 9999999999)
+                phone = "+7(" + str(phone_raw)[0:2] + ")" + str(phone_raw)[3:5] + "-" + str(phone_raw)[6:7] + '-' \
+                        + str(phone_raw)[8:9]
+                self.noone.auth_sms_field.input_text(phone_raw)
+                # self.noone.auth_sms_field.input_text(phone)
+                # print(phone)
+                print("+7" + str(phone_raw))
+                self.noone.auth_send_code.click()
+                self.noone.auth_modal_close.click()
+                # self.driver.find_element(By.XPATH, '//*[@id="modal-auth-phone"]/div/div/div[1]/button').click()
+                self.driver.refresh()
+            except:
+                frame = self.driver.find_element(By.XPATH, '//iframe[@class="flocktory-widget"]')
+                self.driver.switch_to.frame(frame)
+                self.driver.find_element(By.XPATH, '//button[@class="pc__close"]').click()
+                self.driver.switch_to.default_content()
+                self.auth_sms()
 
     def auth_fields(self):
         auth_info = {
