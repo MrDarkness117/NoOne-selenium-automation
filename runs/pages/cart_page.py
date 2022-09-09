@@ -359,6 +359,10 @@ class CartPage(CoreLocators):
         )
 
     @property
+    def label_delivery(self):
+        return self.XPATH('//label[contains(text(), "Доставка")]')
+
+    @property
     def label_pickup(self):
         return self.XPATH('//label[contains(text(), "Самовывоз")]')
 

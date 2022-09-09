@@ -32,13 +32,15 @@ api_id = 16834116
 api_hash = 'bb33295647d9d753684d3cf8850ab1ca'
 client = TelegramClient('me', api_id, api_hash)
 
+test_complete = False
+
 
 class RunCartPickup(object):
     # Настройки
 
     options = Options()
-    prefs = {"profile.managed_default_content_settings.images": 2}
-    options.add_experimental_option('prefs', prefs)
+    # prefs = {"profile.managed_default_content_settings.images": 2}
+    # options.add_experimental_option('prefs', prefs)
     # driver = webdriver.Chrome(options=options)
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.set_window_position(-2000, 0)
@@ -52,7 +54,6 @@ class RunCartPickup(object):
     url = driver.current_url
     skipCollection = False
 
-    test_complete = False
 
     def test_run(self):
 
@@ -132,7 +133,8 @@ class RunCartPickup(object):
             self.order_comment_click()
             self.order_comment_text()
             self.order_btn()
-            self.test_complete = True
+            global test_complete
+            test_complete = True
             self.cancel_order()
         except Exception as e:
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
@@ -395,6 +397,7 @@ class RunCartPickup(object):
 
     def select_map(self):
         log("Нажать на кнопку выбора пункта самовывоза на карте")
+        time.sleep(10)
         self.noone.select_map.click()
 
     def payment_method_click(self):
@@ -470,7 +473,7 @@ async def send_telegram():
     #                                                                  "Крит-автотест по сайту noone.ru (Авторизация, "
     #                                                                  "Каталог, Корзина (NO ONE; Онлайн), ЛК: Заказы) "
     #                                                                  "пройден успешно."))
-    if not RunCartPickup().test_complete:
+    if not test_complete:
         with open(latest_file, 'r', encoding='utf8') as f:
             report_text = f.read()
             f.close()

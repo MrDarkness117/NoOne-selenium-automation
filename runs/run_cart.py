@@ -32,6 +32,8 @@ api_id = 16834116
 api_hash = 'bb33295647d9d753684d3cf8850ab1ca'
 client = TelegramClient('me', api_id, api_hash)
 
+test_complete = False
+
 
 class RunCart(object):
     # Настройки
@@ -51,8 +53,6 @@ class RunCart(object):
     noone.go()
     url = driver.current_url
     skipCollection = False
-
-    test_complete = False
 
     def test_run(self):
 
@@ -144,7 +144,8 @@ class RunCart(object):
             self.order_comment_click()
             self.order_comment_text()
             self.order_btn()
-            self.test_complete = True
+            global test_complete
+            test_complete = True
             self.cancel_order()
         except Exception as e:
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(e))
@@ -403,6 +404,13 @@ class RunCart(object):
         log("Выбрать первый из выпадающего списка город (г Москва)")
         self.noone.city_select_element(city).click()
 
+    def select_delivery(self):
+        log("Выбрать метод \"Доставка\"")
+        try:
+            self.noone.label_delivery.click()
+        except:
+            log('='*5 + "Метод \"Доставка\" уже выбран")
+
     def form_check_deselect(self):
         checkbox_test = self.driver.execute_script("document.querySelector('.form-check-input').checked")
         log("Отключить чек-бокс \"Запомнить адрес\". Автоматическая проверка состояния чекбокса:")
@@ -528,7 +536,7 @@ async def send_telegram():
     #                                                                  "Крит-автотест по сайту noone.ru (Авторизация, "
     #                                                                  "Каталог, Корзина (NO ONE; Онлайн), ЛК: Заказы) "
     #                                                                  "пройден успешно."))
-    if not RunCart().test_complete:
+    if not test_complete:
         with open(latest_file, 'r', encoding='utf8') as f:
             report_text = f.read()
             f.close()
