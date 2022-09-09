@@ -33,7 +33,7 @@ api_hash = 'bb33295647d9d753684d3cf8850ab1ca'
 client = TelegramClient('me', api_id, api_hash)
 
 
-class RunCart(object):
+class RunCartPickup(object):
     # Настройки
 
     options = Options()
@@ -68,7 +68,7 @@ class RunCart(object):
             # Действия Cart Page
             self.auth()
             self.auth_fields()
-            WebDriverWait(self.driver, 20).until(EC.invisibility_of_element((By.XPATH, '//a[@id="modal-auth-phone"]')))
+            WebDriverWait(self.driver, 10).until(EC.invisibility_of_element((By.XPATH, '//a[@id="modal-auth-phone"]')))
             self.cart_click()
 
             # OLD
@@ -118,28 +118,16 @@ class RunCart(object):
                 log("/" * 10 + "ВНИМАНИЕ: Невозможно выбрать адрес из истории!" + "\\" * 10)
                 WebDriverWait(self.driver, 10).until(
                     EC.invisibility_of_element_located((By.XPATH, '//div[@class="loader-overlay"]')))
-                self.noone.form_address_change.click()  # TODO: Внедрить проверку "Выбрать другой"
-                self.form_info()
-                self.form_check_deselect()
                 log("Нажать \"Продолжить\"")
-                self.noone.form_continue().click()
-                # self.noone.form_address_show_all().click()  # FIXME: Deprecated?
-                if self.noone.form_address_label_text.text == "Россия, Москва, ул Профсоюзная, 37, кв 43":  # FIXME: В строке отображается без "Россия" и "кв 43", а также вместо "37" - "д 37"
-                    log("=" * 5 + "Адреса соответствуют")
-                # try:
-                #     log("="*5 + "Проверка зависания")
-                #     self.driver.find_element_by_xpath("//ul[@class='form-autocomplete-list']")
-                #     log('/'*10 + "Список адресов завис!!" + "\\"*10)
-                # except:
-                #     log("="*5 + "Зависания не произошло")
                 self.noone.select_all.click()
                 time.sleep(10)
                 self.noone.select_all.click()
                 time.sleep(10)
-            self.delivery_click()
-            self.delivery_date_click()
-            self.delivery_date_select_click()
             time.sleep(1)
+            self.label_pickup()
+            self.select_pickup()
+            self.select_atrium()
+            self.select_map()
             self.payment_method_click()
             self.order_comment_click()
             self.order_comment_text()
@@ -151,12 +139,12 @@ class RunCart(object):
             exception(e)
 
             # traceback.print_tb(e.__traceback__)
-            TakeScreenshot(RunCart()).take_screenshot()
+            TakeScreenshot(RunCartPickup()).take_screenshot()
 
         log("=" * 5 + "Завершение тестирования.")
 
         self.driver.quit()
-        LogReport(testblock=RunCart(), logs=logging.log).test_results()
+        LogReport(testblock=RunCartPickup(), logs=logging.log).test_results()
 
     # Команды
 
@@ -181,7 +169,7 @@ class RunCart(object):
 
     def cart_click(self):
         log("Нажать на кнопку корзины товаров")
-        WebDriverWait(self.driver, 30).until(
+        WebDriverWait(self.driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, '//a[@class="nav-link js-basket-line"]')))
         self.noone.cart.click()
 
@@ -309,6 +297,7 @@ class RunCart(object):
             WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
                 self.driver.find_element(By.XPATH, '//div[@class="item-gallery"]//a[@class="text-link"]'))).get_attribute(
                 "href")))
+        log("=" * 5 + "Проверить резервирование")
         try:
             log("Выбрать размер обуви")
             self.noone.catalog_preview_size_select.click()
@@ -319,9 +308,6 @@ class RunCart(object):
             log("Открыть окно резервирования")
             self.noone.catalog_preview_reserve.click()
             try:
-                log("=" * 5 + "Товар: {}".format(
-                    self.driver.find_element(By.XPATH, '//div[@class="item-gallery"]//a[@class="text-link"]')
-                        .get_attribute("href")))
                 log("Открыть выбрать первый доступный бутик")
                 self.noone.catalog_preview_reserve_boutique.click()
                 log("Проверить доступность кнопки \"Зарезервировать\"")
@@ -331,7 +317,7 @@ class RunCart(object):
             log("Закрыть окно резервирования")
             self.noone.catalog_preview_reserve_close.click()
         except:
-            log("/" * 10 + "Нет кнопки зарезервировать! " + '\\' * 10)
+            log("/" * 10 + "Нет кнопки зарезервировать! " + str(self.driver.current_url) + '\\' * 10)
         log("Нажать \"Добавить в корзину\"")
         self.noone.catalog_preview_add_to_cart.click()
         log("Перейти в корзину через кнопку появившегося модального окна")
@@ -353,6 +339,7 @@ class RunCart(object):
                 "href")))
         log("=" * 5 + "Проверить резервирование")
         try:
+            log("=" * 5 + "Проверить резервирование")
             log("Открыть окно резервирования")
             self.noone.catalog_preview_reserve.click()
             log("Открыть выбрать первый доступный бутик")
@@ -365,7 +352,7 @@ class RunCart(object):
             log("Закрыть окно резервирования")
             self.noone.catalog_preview_reserve_close.click()
         except:
-            log("/" * 10 + "Нет кнопки зарезервировать! " + '\\' * 10)
+            log("/" * 10 + "Нет кнопки зарезервировать! " + str(self.driver.current_url) + '\\' * 10)
         log("Нажать \"Добавить в корзину\"")
         self.driver.find_element_by_xpath('//span[contains(text(), "Добавить в корзину")]').click()
         log("Перейти в корзину через кнопку появившегося модального окна")
@@ -394,66 +381,21 @@ class RunCart(object):
         except:
             log("=" * 5 + "Уведомление отсутствует")
 
-    def city_select_click(self):
-        log("Кнопка выбора города")
-        self.noone.city_select.click()
+    def label_pickup(self):
+        log("Выбрать самовывоз")
+        self.noone.label_pickup.click()
 
-    def city_select_element_click(self):
-        city = 1  # г Москва
-        log("Выбрать первый из выпадающего списка город (г Москва)")
-        self.noone.city_select_element(city).click()
+    def select_pickup(self):
+        log("Нажать кнопку выбрать пункт самовывоза")
+        self.noone.select_pickup.click()
 
-    def form_check_deselect(self):
-        checkbox_test = self.driver.execute_script("document.querySelector('.form-check-input').checked")
-        log("Отключить чек-бокс \"Запомнить адрес\". Автоматическая проверка состояния чекбокса:")
-        if str(checkbox_test) != 'false':
-            # self.noone.form_check_save
-            WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, '//span[contains(text(), "Сохранить адрес")]//..'))).click()
-            log('=' * 5 + "Чекбокс не был отключен.")
-        else:
-            log('=' * 5 + "Чекбокс уже отключен.")
+    def select_atrium(self):
+        log("Выбрать магазин Атриум")
+        self.noone.select_atrium.click()
 
-    def form_info(self):
-        # if self.noone.form_info("Улица и дом").text != 'г Москва, ул Профсоюзная, д 37':
-        #     self.driver.find_elements_by_xpath('//ul[@class="form-autocomplete-list"]/li[1]').click()
-        log("Заполнить информацию адреса доставки")
-        self.noone.form_info("Квартира").input_text('43')
-        self.noone.form_info("Подъезд").input_text('3')
-        self.noone.form_info("Этаж").input_text('1')
-        self.noone.form_info("Код домофона").input_text('43к0000')
-        self.noone.form_info("Улица и дом").click()
-        self.noone.form_info("Улица и дом").hover_center_and_click()
-        self.noone.form_info("Улица и дом").input_text('г Москва, ')
-        time.sleep(1)
-        self.noone.form_info("Улица и дом").input_text('ул Профсоюзная, ')
-        time.sleep(1)
-        self.noone.form_info("Улица и дом").input_text('д 37')  # TODO: Баг!!! http://proj.noone.ru/issues/124838
-        # self.noone.form_info("Улица и дом").input_text('д 3')
-        time.sleep(3)
-        self.driver.find_element_by_xpath('//div[@class="form-group form-autocomplete"]'
-                                          '//li[1]').click()
-
-    def delivery_click(self):
-        log("Выбрать метод доставки")
-        # self.noone.form_delivery.click()
-        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
-            (By.XPATH, '//div[@class="order-block"]/div[@class="row row-gap-20"][1]/div[1]'))).click()
-
-    def delivery_date_click(self):
-        log("=" * 5 + "Выбираем дату доставки")
-        try:
-            log("Нажать на выбор даты доставки")
-            self.noone.form_delivery_date().click()
-        except:
-            log("/" * 10 + "ВНИМАНИЕ: Кнопка выбора даты отсутствует!" + '\\' * 10)
-
-    def delivery_date_select_click(self):
-        try:
-            log("Выбрать дату доставки")
-            self.noone.form_delivery_date_element().click()
-        except:
-            log("/" * 10 + "ВНИМАНИЕ: Выбрать дату невозможно" + '\\' * 10)
+    def select_map(self):
+        log("Нажать на кнопку выбора пункта самовывоза на карте")
+        self.noone.select_map.click()
 
     def payment_method_click(self):
         log("Выбрать метод оплаты")
@@ -508,7 +450,7 @@ class RunCart(object):
     log('=' * 5 + "Проверка оформления заказа")
 
 
-test_start = "=" * 5 + "Начало тестирования {}.".format(RunCart().__class__.__name__)
+test_start = "=" * 5 + "Начало тестирования {}.".format(RunCartPickup().__class__.__name__)
 
 
 async def send_telegram():
@@ -528,7 +470,7 @@ async def send_telegram():
     #                                                                  "Крит-автотест по сайту noone.ru (Авторизация, "
     #                                                                  "Каталог, Корзина (NO ONE; Онлайн), ЛК: Заказы) "
     #                                                                  "пройден успешно."))
-    if not RunCart().test_complete:
+    if not RunCartPickup().test_complete:
         with open(latest_file, 'r', encoding='utf8') as f:
             report_text = f.read()
             f.close()
@@ -548,7 +490,7 @@ async def send_telegram():
 
 
 if __name__ == '__main__':
-    RunCart().test_run()
+    RunCartPickup().test_run()
     test_start = "=" * 5 + "Начало тестирования."
 
     with client:

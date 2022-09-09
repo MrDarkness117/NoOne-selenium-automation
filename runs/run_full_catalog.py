@@ -409,9 +409,3 @@ test_start = "=" * 5 + "Начало тестирования {}.".format(RunFul
 
 if __name__ == '__main__':
     RunFullCatalog().test_run()
-<<<<<<< HEAD
-    # schedule.every().day.at("01:00").do(RunFullCatalog().test_run())
-    # while True:
-    #     schedule.run_pending()
-=======
->>>>>>> 7b76d86ac613af34de1453fd64d51d1f818a4af3

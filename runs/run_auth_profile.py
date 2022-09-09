@@ -46,7 +46,9 @@ class RunAuthProfile(object):
             # Действия Cart Page
             # self.auth()
             # self.auth_fields()
+
             for n in range(0, 50):
+
                 self.auth_sms()
             # self.foot_size_select()
             # self.cloth_size_select()
@@ -57,6 +59,7 @@ class RunAuthProfile(object):
             # self.open_sections()
             # self.log_out
             self.driver.quit()
+
         except Exception as e:
             print(exception(e))
             log("/" * 10 + "ОШИБКА: Во время работы произошёл сбой!" + "\\" * 10 + "\nОшибка: {}".format(str(e)))

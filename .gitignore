@@ -10,3 +10,4 @@ venv*
 /runs/run_dm2.bat
 */.pytest_cache/
 *.json
+runs/me.session
