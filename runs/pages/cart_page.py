@@ -110,6 +110,14 @@ class CartPage(CoreLocators):
         )
 
     @property
+    def open_cities(self):
+        return self.XPATH('//span[@id="region-name"]')
+
+    @property
+    def select_city_moscow(self):
+        return self.XPATH('//li[@data-code="77000000000"]')
+
+    @property
     def header_logo(self):
         """
                 Логотип страницы
@@ -134,14 +142,7 @@ class CartPage(CoreLocators):
         Кнопка корзины
         :return:
         """
-        locator = Locator(
-            by=By.XPATH,
-            value='//a[@class="nav-link js-basket-line"]'
-        )
-        return BaseElement(
-            driver=self.driver,
-            locator=locator
-        )
+        return self.XPATH('//a[@class="nav-link js-basket-line"]')
 
     @property
     def dy_product_card(self):
@@ -224,7 +225,7 @@ class CartPage(CoreLocators):
         """
         locator = Locator(
             by=By.XPATH,
-            value='//div[contains(@class, "item-size-block")]/div'
+            value='//div[contains(@class, "item-size-block")]/ul/li'
         )
         return BaseElement(
             driver=self.driver,

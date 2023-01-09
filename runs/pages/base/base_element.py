@@ -28,13 +28,13 @@ class BaseElement(object):
         return attribute
 
     def click(self):
-        element = WebDriverWait(self.driver, 10)\
+        element = WebDriverWait(self.driver, 15)\
             .until(EC.element_to_be_clickable(self.locator))
         element.click()
         return None
 
     def hover_center(self):
-        element = WebDriverWait(self.driver, 10)\
+        element = WebDriverWait(self.driver, 15)\
             .until(EC.visibility_of_element_located(locator=self.locator))
         actions = ActionChains(driver=self.driver)
         actions.move_to_element(element).perform()  # set the cursor to be in the middle
@@ -44,13 +44,13 @@ class BaseElement(object):
         actions.move_by_offset(x, y).perform()
 
     def hover_center_and_click(self):
-        element = WebDriverWait(self.driver, 10) \
+        element = WebDriverWait(self.driver, 15) \
             .until(EC.visibility_of_element_located(locator=self.locator))
         actions = ActionChains(driver=self.driver)
         actions.move_to_element(element).click().perform()  # set the cursor to be in the middle
 
     def hover_center_offset_and_click(self, x=0, y=0):
-        element = WebDriverWait(self.driver, 10)\
+        element = WebDriverWait(self.driver, 15)\
             .until(EC.visibility_of_element_located(locator=self.locator))
         actions = ActionChains(driver=self.driver)
         actions.move_to_element(element).move_by_offset(x, y).click().perform()
