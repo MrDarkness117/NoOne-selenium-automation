@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
-
+import re
 import traceback
 import datetime
 import random
@@ -27,6 +27,9 @@ logging = Logging()
 log = logging.logger
 
 tg_chat_zabbix = -444987572
+tg_chat_autotest = -639744499
+tg_chat_me = 374550034
+chat = tg_chat_me
 
 api_id = 16834116
 api_hash = 'bb33295647d9d753684d3cf8850ab1ca'
@@ -52,7 +55,7 @@ class RunCart(object):
     noone = Page(driver=driver)
     noone.go()
     url = driver.current_url
-    skipCollection = False
+    skipRR = True
 
     def test_run(self):
 
@@ -68,12 +71,13 @@ class RunCart(object):
             # Действия Cart Page
             self.auth()
             self.auth_fields()
-            WebDriverWait(self.driver, 20).until(EC.invisibility_of_element((By.XPATH, '//a[@id="modal-auth-phone"]')))
+            WebDriverWait(self.driver, 30).until(EC.invisibility_of_element((By.XPATH, '//div[@id="modal-auth"]')))
+            self.select_city()
             self.cart_click()
 
             # OLD
 
-            if not self.skipCollection:
+            if not self.skipRR:
                 self.product_recommended_hover()
                 self.preview_click()
                 try:
@@ -81,24 +85,24 @@ class RunCart(object):
                     self.item_size_click()
                     self.item_add_click()  # self.accept_click()
                 except Exception as e:
-                    log("/" * 10 + "ОШИБКА: Не найдены блоки размеров предпросмотра! Возможна долгая загрузка сайта." + "\\" * 10)
+                    log("/" * 10 + "ОШИБКА: Не найдены блоки размеров предпросмотра Retail Rocket! Возможна долгая загрузка сайта." + "\\" * 10)
                     try:
                         log('=' * 5 + "Закрываю модальное окно")
                         self.noone.close_modal_preview.click()
                     except:
                         log('/' * 10 + "Отсутствует модальное окно" + '\\' * 10)
 
-                with open('C:\\Users\\admin\\Documents\\GitHub\\NoOne-selenium-automation\\runs\\ids.json') as i:
-                    data = json.load(i)
+            with open('C:\\Users\\admin\\Documents\\GitHub\\NoOne-selenium-automation\\runs\\ids.json') as i:
+                data = json.load(i)
 
-                if len(data) > 0:
-                    for d in data:
-                        self.search_item(str(d))
-                        self.item_page()
-                        self.noone.cart.click()
-                elif len(data) == 0:
-                    self.add_shoes_from_catalog()
-                    self.add_bags_from_catalog()
+            if len(data) > 0:
+                for d in data:
+                    self.search_item(str(d))
+                    self.item_page()
+                    self.noone.cart.click()
+            elif len(data) == 0:
+                self.add_shoes_from_catalog()
+                # self.add_bags_from_catalog()  #FIXME: Андрей должен исправить резервы в карточке товара, тогда включу
 
             self.surname_enter()
             self.check_limits()
@@ -116,8 +120,11 @@ class RunCart(object):
                 time.sleep(10)
             except:
                 log("/" * 10 + "ВНИМАНИЕ: Невозможно выбрать адрес из истории!" + "\\" * 10)
-                WebDriverWait(self.driver, 10).until(
-                    EC.invisibility_of_element_located((By.XPATH, '//div[@class="loader-overlay"]')))
+                try:
+                    WebDriverWait(self.driver, 10).until(
+                        EC.invisibility_of_element_located((By.XPATH, '//div[@class="loader-overlay"]')))
+                except:
+                    log("="*5 + "Лоадер не найден")
                 self.noone.form_address_change.click()  # TODO: Внедрить проверку "Выбрать другой"
                 self.form_info()
                 self.form_check_deselect()
@@ -175,6 +182,13 @@ class RunCart(object):
         WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
             self.driver.find_element(By.XPATH, '//button[contains(text(), "Войти в аккаунт")]')))
         self.noone.auth_field_button.click()
+
+    def select_city(self):
+        log("="*5 + "Выбрать г. Москва")
+        self.driver.execute_script("window.scrollBy(0, -2000)")
+        self.noone.open_cities.click()
+        self.noone.select_city_moscow.click()
+
 
     def logo(self):
         log("Перейти по логотипу на главную страницу")
@@ -336,7 +350,11 @@ class RunCart(object):
         log("Нажать \"Добавить в корзину\"")
         self.noone.catalog_preview_add_to_cart.click()
         log("Перейти в корзину через кнопку появившегося модального окна")
-        self.noone.catalog_preview_go_to_cart.click()
+        try:
+            WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.noone.catalog_preview_go_to_cart)).click()
+        except:
+            log("=" * 5 + "Исправить код, не могу найти элемент...")
+            self.noone.catalog_preview_go_to_cart.click()
 
     def add_bags_from_catalog(self):
         log("=" * 5 + "Перехожу на страницу каталога")
@@ -349,7 +367,7 @@ class RunCart(object):
         log("Открыть окно превью первого товара")
         self.noone.catalog_preview_btn.click()
         log("=" * 5 + "Товар: {}".format(
-            WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
+            WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable(
                 self.driver.find_element(By.XPATH, '//div[@class="item-gallery"]//a[@class="text-link"]'))).get_attribute(
                 "href")))
         log("=" * 5 + "Проверить резервирование")
@@ -368,7 +386,7 @@ class RunCart(object):
         except:
             log("/" * 10 + "Нет кнопки зарезервировать! " + '\\' * 10)
         log("Нажать \"Добавить в корзину\"")
-        self.driver.find_element_by_xpath('//span[contains(text(), "Добавить в корзину")]').click()
+        self.driver.find_element(By.XPATH, '//span[contains(text(), "Добавить в корзину")]').click()
         log("Перейти в корзину через кнопку появившегося модального окна")
         try:
             self.noone.catalog_preview_go_to_cart.click()
@@ -445,8 +463,14 @@ class RunCart(object):
     def delivery_click(self):
         log("Выбрать метод доставки")
         # self.noone.form_delivery.click()
-        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
-            (By.XPATH, '//div[@class="order-block"]/div[@class="row row-gap-20"][1]/div[1]'))).click()
+        try:
+            log("="*5 + "Проверка активности доставки")
+            self.driver.find_element(By.XPATH, '//label[contains(text(), "Доставка")]/../li[@class="tab-nav-item active"]')
+            log("="*5 + "Доставка активна")
+        except:
+            log("="*5 + "Доставка неактивна")
+            WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
+                (By.XPATH, '//label[contains(text(), "Доставка")]'))).click()
 
     def delivery_date_click(self):
         log("=" * 5 + "Выбираем дату доставки")
@@ -488,6 +512,15 @@ class RunCart(object):
         # self.noone.order_btn.click()
         WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(
             (By.XPATH, '//*[@id="checkout"]/div/div[2]/div/div[1]/div[2]/div[3]/div/button'))).click()
+        cart_price = '//*[@class="cart-data cart-price-total"]//*[@class="cart-data-value"]'
+        iframe = '//iframe[@class=" with-appled"]'
+        cp_price = '//div[@class="header-component__cost"]/span'
+        cart = re.sub("^[0-9]", '', self.driver.find_element(By.XPATH, cart_price).text)
+        self.driver.switch_to.frame(
+            WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, iframe))))
+        cp = re.sub("^[0-9]", '', self.driver.find_element(By.XPATH, cp_price).text)
+        self.driver.switch_to.default_content()
+        assert cp == cart, "Ошибка соответствия цен товаров! CloudPayments != чекаут."
 
     def cancel_order(self):
         log("=" * 5 + "Отмена заказа")
@@ -543,16 +576,16 @@ async def send_telegram():
         async with client:
             from telethon.errors.rpcerrorlist import MediaCaptionTooLongError
             try:
-                await client.send_file(tg_chat_zabbix, latest_screenshot, caption="Результаты автотеста на {}:\n\n".format(
+                await client.send_file(chat, latest_screenshot, caption="Результаты автотеста на {}:\n\n".format(
                     datetime.datetime.today()) + "Ошибка во время тестирования! \nШаги воспроизведения: \n\n{}"
                                        .format(report_text))
 
             except MediaCaptionTooLongError:
-                await client.send_file(tg_chat_zabbix, latest_screenshot, caption="Результаты автотеста на {}:\n\n".format(
+                await client.send_file(chat, latest_screenshot, caption="Результаты автотеста на {}:\n\n".format(
                     datetime.datetime.today()) + "Ошибка во время тестирования! \nЛог в файле ниже."
                                        .format(report_text))
             time.sleep(5)
-            await client.send_file(tg_chat_zabbix, latest_file)
+            await client.send_file(chat, latest_file)
 
 
 if __name__ == '__main__':
